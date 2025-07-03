@@ -113,6 +113,11 @@ textarea, input, select {
   border-radius: 4px;
 }
 
+#sanitizedText {
+  background: var(--viz-cell-bg);
+  font-family: monospace;
+}
+
 button#processButton {
   background: var(--button-bg);
   color: var(--button-text);
@@ -130,36 +135,42 @@ button#processButton:hover {
   margin-top: 2rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  padding: 1rem;
 }
 
 .viz-table {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: fit-content;
+  display: table;
   width: max-content;
+  border-spacing: 4px;
 }
 
 .viz-row {
-  display: grid;
-  grid-auto-columns: minmax(30px, auto);
-  grid-auto-flow: column;
-  gap: 4px;
+  display: table-row;
+}
+
+.viz-row .header,
+.viz-row .viz-cell {
+  display: table-cell;
+  padding: 0.6rem 0.8rem;
+  text-align: center;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 .viz-row .header {
   font-weight: bold;
   background: var(--viz-header-bg);
-  padding: 0.4rem;
-  text-align: center;
-  border-radius: 4px;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 60px;
 }
 
-.viz-row div {
-  padding: 0.4rem;
+.viz-row .viz-cell {
   background: var(--viz-cell-bg);
-  text-align: center;
-  border-radius: 4px;
+  min-width: 40px;
 }
 
 /* Vigenère 表 */

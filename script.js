@@ -86,6 +86,11 @@ document.getElementById('processButton').addEventListener('click', () => {
   const mode = document.getElementById('mode').value;
   const key = document.getElementById('key').value;
   const inputText = document.getElementById('inputText').value;
+  
+  // Show sanitized text
+  const sanitizedInput = sanitize(inputText);
+  document.getElementById('sanitizedText').value = sanitizedInput;
+  
   const { result, visualization } = vigenere(inputText, key, mode);
   document.getElementById('outputText').value = result;
   displayVisualization(visualization);
