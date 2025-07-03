@@ -10,22 +10,31 @@
   <div class="container">
     <div class="header-container">
       <h1>ヴィジュネル暗号ツール<br>（Vigenere Cipher Tool）</h1>
-      <button id="theme-toggle" aria-label="テーマ切替">
-        <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
+      <div class="header-buttons">
+        <button id="help-toggle" aria-label="ヘルプ">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+        <button id="theme-toggle" aria-label="テーマ切替">
+          <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <label for="mode">モード選択:</label>
@@ -57,6 +66,52 @@
         🔗 GitHubリポジトリはこちら（<a href="https://github.com/ipusiron/vigenere-cipher-tool" target="_blank">ipusiron/vigenere-cipher-tool</a>）
       </div>
     </footer>
+
+  <!-- Help Modal -->
+  <div id="help-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>ヴィジュネル暗号ツールの使い方</h2>
+        <button class="modal-close" aria-label="閉じる">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3>概要</h3>
+        <p>ヴィジュネル暗号は、16世紀に考案された多表式換字暗号です。鍵となる単語を使って平文を暗号化します。</p>
+        
+        <h3>使い方</h3>
+        <ol>
+          <li><strong>モード選択</strong>: 「暗号化」または「復号」を選択します</li>
+          <li><strong>テキスト入力</strong>: 暗号化したい平文、または復号したい暗号文を入力します
+            <ul>
+              <li>英字以外の文字（数字、記号、空白など）は自動的に除外されます</li>
+              <li>大文字・小文字は区別されません</li>
+            </ul>
+          </li>
+          <li><strong>鍵の入力</strong>: 暗号化・復号に使用する鍵を英字で入力します（例: LEMON）</li>
+          <li><strong>実行</strong>: 「実行」ボタンをクリックすると結果が表示されます</li>
+        </ol>
+        
+        <h3>機能説明</h3>
+        <ul>
+          <li><strong>処理対象テキスト</strong>: 実際に暗号化・復号される英字のみのテキストが表示されます</li>
+          <li><strong>対応関係の可視化</strong>: 各文字の変換過程が表示されます
+            <ul>
+              <li>マウスを合わせると、ヴィジュネル表の対応する部分がハイライトされます</li>
+            </ul>
+          </li>
+          <li><strong>ヴィジュネル表</strong>: 暗号化・復号に使用される26×26の換字表です</li>
+        </ul>
+        
+        <h3>暗号化の仕組み</h3>
+        <p>各文字は以下の手順で変換されます：</p>
+        <ol>
+          <li>平文の文字と鍵の文字を対応させます（鍵は必要に応じて繰り返されます）</li>
+          <li>ヴィジュネル表で、平文の文字（列）と鍵の文字（行）の交点にある文字が暗号文になります</li>
+          <li>復号は逆の操作を行います</li>
+        </ol>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

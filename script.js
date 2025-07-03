@@ -146,4 +146,30 @@ function clearTableHighlight() {
   highlighted.forEach(cell => cell.classList.remove('highlight'));
 }
 
+// Help modal functionality
+const helpToggle = document.getElementById('help-toggle');
+const helpModal = document.getElementById('help-modal');
+const modalClose = document.querySelector('.modal-close');
+
+helpToggle.addEventListener('click', () => {
+  helpModal.classList.add('show');
+});
+
+modalClose.addEventListener('click', () => {
+  helpModal.classList.remove('show');
+});
+
+helpModal.addEventListener('click', (e) => {
+  if (e.target === helpModal) {
+    helpModal.classList.remove('show');
+  }
+});
+
+// ESC key to close modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && helpModal.classList.contains('show')) {
+    helpModal.classList.remove('show');
+  }
+});
+
 generateTable();
