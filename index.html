@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ヴィジュネル暗号ツール（Vigenere Cipher Tool）</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header-container">
+      <h1>ヴィジュネル暗号ツール<br>（Vigenere Cipher Tool）</h1>
+      <button id="theme-toggle" aria-label="テーマ切替">
+        <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <label for="mode">モード選択:</label>
+    <select id="mode">
+      <option value="encrypt">暗号化</option>
+      <option value="decrypt">復号</option>
+    </select>
+
+    <label for="key">鍵（英字）:</label>
+    <input type="text" id="key" placeholder="例: LEMON" />
+
+    <label for="inputText">入力テキスト:</label>
+    <textarea id="inputText" rows="5" placeholder="ここに平文または暗号文を入力"></textarea>
+
+    <button id="processButton">実行</button>
+
+    <label for="outputText">出力結果:</label>
+    <textarea id="outputText" rows="5" readonly></textarea>
+
+    <div id="visualization"></div>
+    <div id="vigenereTable"></div>
+  </div>
+
+    <footer class="app-footer">
+      <div class="footer">
+        🔗 GitHubリポジトリはこちら（<a href="https://github.com/ipusiron/vigenere-cipher-tool" target="_blank">ipusiron/vigenere-cipher-tool</a>）
+      </div>
+    </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

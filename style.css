@@ -1,0 +1,205 @@
+/* style.css */
+:root {
+  --bg-color: #f0f0f0;
+  --text-color: #333;
+  --container-bg: #fff;
+  --input-bg: #fff;
+  --input-border: #ccc;
+  --button-bg: #007bff;
+  --button-text: #fff;
+  --link-color: #007bff;
+  --viz-header-bg: #e9ecef;
+  --viz-cell-bg: #f8f9fa;
+  --table-border: #dee2e6;
+  --table-header-bg: #f2f2f2;
+}
+
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: #f0f0f0;
+  --container-bg: #1e1e1e;
+  --input-bg: #222;
+  --input-border: #555;
+  --button-bg: #007acc;
+  --button-text: #fff;
+  --link-color: #00aaff;
+  --viz-header-bg: #444;
+  --viz-cell-bg: #333;
+  --table-border: #666;
+  --table-header-bg: #333;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 2rem;
+  line-height: 1.6;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--container-bg);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+#theme-toggle {
+  padding: 0.5rem;
+  background: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+#theme-toggle:hover {
+  background: var(--viz-cell-bg);
+}
+
+.theme-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.sun-icon {
+  display: none;
+}
+
+.moon-icon {
+  display: block;
+}
+
+[data-theme="dark"] .sun-icon {
+  display: block;
+}
+
+[data-theme="dark"] .moon-icon {
+  display: none;
+}
+
+label, select, input, textarea, button {
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+textarea, input, select {
+  padding: 0.5rem;
+  background: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+}
+
+button#processButton {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  padding: 0.7rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button#processButton:hover {
+  opacity: 0.9;
+}
+
+#visualization {
+  margin-top: 2rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.viz-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: fit-content;
+  width: max-content;
+}
+
+.viz-row {
+  display: grid;
+  grid-auto-columns: minmax(30px, auto);
+  grid-auto-flow: column;
+  gap: 4px;
+}
+
+.viz-row .header {
+  font-weight: bold;
+  background: var(--viz-header-bg);
+  padding: 0.4rem;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.viz-row div {
+  padding: 0.4rem;
+  background: var(--viz-cell-bg);
+  text-align: center;
+  border-radius: 4px;
+}
+
+/* Vigenère 表 */
+#vigenereTable {
+  margin-top: 2rem;
+  overflow-x: auto;
+}
+
+.vig-table {
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.vig-table th, .vig-table td {
+  border: 1px solid var(--table-border);
+  padding: 4px;
+  text-align: center;
+}
+
+.vig-table th {
+  background: var(--table-header-bg);
+}
+
+.vig-table td.highlight {
+  background: #007acc;
+  color: white;
+}
+
+.app-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.app-footer a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  text-decoration: underline;
+}
