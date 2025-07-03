@@ -1,5 +1,6 @@
-/* style.css */
+/* CSS Variables */
 :root {
+  /* Light theme colors */
   --bg-color: #f0f0f0;
   --text-color: #333;
   --container-bg: #fff;
@@ -12,6 +13,12 @@
   --viz-cell-bg: #f8f9fa;
   --table-border: #dee2e6;
   --table-header-bg: #f2f2f2;
+  
+  /* Common values */
+  --border-radius: 4px;
+  --transition-speed: 0.3s;
+  --box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  --modal-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] {
@@ -29,29 +36,39 @@
   --table-header-bg: #333;
 }
 
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   padding: 2rem;
   line-height: 1.6;
-  transition: background-color 0.3s, color 0.3s;
+  margin: 0;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
+/* Container */
 .container {
   max-width: 800px;
   margin: 0 auto;
   background: var(--container-bg);
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow);
 }
 
+/* Header */
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .header-buttons {
@@ -61,7 +78,15 @@ body {
 
 h1 {
   text-align: center;
-  margin-bottom: 0;
+  margin: 0;
+  font-size: 1.5rem;
+  flex: 1;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  transition: all var(--transition-speed);
 }
 
 #theme-toggle,
@@ -70,14 +95,12 @@ h1 {
   background: transparent;
   color: var(--text-color);
   border: 1px solid var(--input-border);
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  transition: background-color 0.3s, border-color 0.3s;
 }
 
 #theme-toggle:hover,
@@ -85,6 +108,22 @@ h1 {
   background: var(--viz-cell-bg);
 }
 
+#processButton {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  padding: 0.7rem;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+#processButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Icons */
 .theme-icon {
   width: 20px;
   height: 20px;
@@ -92,10 +131,6 @@ h1 {
 
 .sun-icon {
   display: none;
-}
-
-.moon-icon {
-  display: block;
 }
 
 [data-theme="dark"] .sun-icon {
@@ -106,45 +141,59 @@ h1 {
   display: none;
 }
 
-label, select, input, textarea, button {
+/* Form Elements */
+label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
   display: block;
+}
+
+select,
+input,
+textarea,
+button {
   width: 100%;
   margin-bottom: 1rem;
 }
 
-textarea, input, select {
+textarea,
+input[type="text"],
+select {
   padding: 0.5rem;
   background: var(--input-bg);
   color: var(--text-color);
   border: 1px solid var(--input-border);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color var(--transition-speed);
+}
+
+textarea:focus,
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--button-bg);
 }
 
 #sanitizedText {
   background: var(--viz-cell-bg);
-  font-family: monospace;
+  font-family: 'Courier New', monospace;
+  resize: none;
 }
 
-button#processButton {
-  background: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  padding: 0.7rem;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-button#processButton:hover {
-  opacity: 0.9;
-}
-
+/* Visualization */
 #visualization {
   margin-top: 2rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
   border: 1px solid var(--input-border);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   padding: 1rem;
+}
+
+#visualization h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 .viz-table {
@@ -162,7 +211,7 @@ button#processButton:hover {
   display: table-cell;
   padding: 0.6rem 0.8rem;
   text-align: center;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   white-space: nowrap;
 }
 
@@ -178,49 +227,58 @@ button#processButton:hover {
 .viz-row .viz-cell {
   background: var(--viz-cell-bg);
   min-width: 40px;
+  cursor: pointer;
+  transition: all var(--transition-speed);
 }
 
-/* Vigenère 表 */
+.viz-row .viz-cell:hover {
+  background: var(--button-bg);
+  color: var(--button-text);
+  transform: translateY(-2px);
+}
+
+/* Vigenère Table */
 #vigenereTable {
   margin-top: 2rem;
   overflow-x: auto;
 }
 
+#vigenereTable h3 {
+  margin-bottom: 1rem;
+}
+
 .vig-table {
   border-collapse: collapse;
   font-size: 0.8rem;
+  margin: 0 auto;
 }
 
-.vig-table th, .vig-table td {
+.vig-table th,
+.vig-table td {
   border: 1px solid var(--table-border);
-  padding: 4px;
+  padding: 4px 6px;
   text-align: center;
+  transition: all var(--transition-speed);
 }
 
 .vig-table th {
   background: var(--table-header-bg);
+  font-weight: bold;
 }
 
-.vig-table td.highlight {
-  background: #007acc;
-  color: white;
-}
-
-.viz-cell {
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.viz-cell:hover {
-  background: var(--button-bg) !important;
+.vig-table td.highlight,
+.vig-table th.highlight {
+  background: var(--button-bg);
   color: var(--button-text);
+  font-weight: bold;
 }
 
+/* Footer */
 .app-footer {
   margin-top: 2rem;
   text-align: center;
   font-size: 0.9rem;
-  color: #aaa;
+  opacity: 0.8;
 }
 
 .app-footer a {
@@ -232,7 +290,7 @@ button#processButton:hover {
   text-decoration: underline;
 }
 
-/* Modal Styles */
+/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -242,26 +300,26 @@ button#processButton:hover {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.3s;
 }
 
 .modal.show {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: fadeIn var(--transition-speed);
 }
 
 .modal-content {
   background: var(--container-bg);
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--modal-shadow);
   max-width: 600px;
   width: 90%;
   max-height: 80vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  animation: slideIn 0.3s;
+  animation: slideIn var(--transition-speed);
 }
 
 .modal-header {
@@ -274,6 +332,7 @@ button#processButton:hover {
 
 .modal-header h2 {
   margin: 0;
+  font-size: 1.3rem;
 }
 
 .modal-close {
@@ -286,10 +345,13 @@ button#processButton:hover {
   height: auto;
   padding: 0;
   line-height: 1;
+  margin: 0;
+  opacity: 0.7;
+  transition: opacity var(--transition-speed);
 }
 
 .modal-close:hover {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .modal-body {
@@ -300,6 +362,7 @@ button#processButton:hover {
 .modal-body h3 {
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 }
 
 .modal-body h3:first-child {
@@ -314,11 +377,21 @@ button#processButton:hover {
 .modal-body ul,
 .modal-body ol {
   margin: 0.5rem 0;
+  padding-left: 1.5rem;
 }
 
+.modal-body strong {
+  color: var(--button-bg);
+}
+
+/* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
@@ -329,5 +402,67 @@ button#processButton:hover {
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+  
+  .container {
+    padding: 1.5rem;
+  }
+  
+  h1 {
+    font-size: 1.2rem;
+  }
+  
+  .header-container {
+    justify-content: center;
+  }
+  
+  .viz-row .header {
+    min-width: 50px;
+    padding: 0.4rem;
+  }
+  
+  .viz-row .viz-cell {
+    padding: 0.4rem;
+    min-width: 30px;
+  }
+  
+  .vig-table {
+    font-size: 0.7rem;
+  }
+  
+  .vig-table th,
+  .vig-table td {
+    padding: 2px 4px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .container {
+    box-shadow: none;
+    max-width: 100%;
+  }
+  
+  .header-buttons,
+  .app-footer,
+  .modal {
+    display: none;
+  }
+  
+  #visualization,
+  #vigenereTable {
+    break-inside: avoid;
   }
 }
