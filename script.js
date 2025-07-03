@@ -42,13 +42,27 @@ function displayVisualization(data) {
   const makeRow = (label, key) => {
     const row = document.createElement('div');
     row.className = 'viz-row';
-    row.innerHTML = `<div class="header">${label}</div>` + data.map(d => `<div>${d[key]}</div>`).join('');
+    row.innerHTML = `<div class="header">${label}</div>` + 
+      data.map((d, i) => `<div class="viz-cell" data-index="${i}" data-plain="${d.plain}" data-key="${d.key}">${d[key]}</div>`).join('');
     return row;
   };
 
   container.appendChild(makeRow('平文', 'plain'));
   container.appendChild(makeRow('鍵', 'key'));
   container.appendChild(makeRow('出力', 'result'));
+  
+  // Add hover event listeners
+  const cells = container.querySelectorAll('.viz-cell');
+  cells.forEach(cell => {
+    cell.addEventListener('mouseenter', () => {
+      const plain = cell.dataset.plain;
+      const key = cell.dataset.key;
+      highlightTableCell(plain, key);
+    });
+    cell.addEventListener('mouseleave', () => {
+      clearTableHighlight();
+    });
+  });
 }
 
 function generateTable() {
@@ -88,5 +102,43 @@ themeToggle.addEventListener('click', () => {
   document.documentElement.setAttribute('data-theme', newTheme);
   localStorage.setItem('theme', newTheme);
 });
+
+function highlightTableCell(plainChar, keyChar) {
+  const table = document.querySelector('.vig-table');
+  if (!table) return;
+  
+  // Clear previous highlights
+  clearTableHighlight();
+  
+  // Get row and column indices
+  const rowIndex = keyChar.charCodeAt(0) - 65 + 1; // +1 for header row
+  const colIndex = plainChar.charCodeAt(0) - 65 + 1; // +1 for header column
+  
+  // Highlight the cell
+  const rows = table.querySelectorAll('tr');
+  if (rows[rowIndex]) {
+    const cells = rows[rowIndex].querySelectorAll('td, th');
+    if (cells[colIndex]) {
+      cells[colIndex].classList.add('highlight');
+    }
+    // Highlight row header
+    if (cells[0]) {
+      cells[0].classList.add('highlight');
+    }
+  }
+  
+  // Highlight column header
+  if (rows[0]) {
+    const headerCells = rows[0].querySelectorAll('th');
+    if (headerCells[colIndex]) {
+      headerCells[colIndex].classList.add('highlight');
+    }
+  }
+}
+
+function clearTableHighlight() {
+  const highlighted = document.querySelectorAll('.vig-table .highlight');
+  highlighted.forEach(cell => cell.classList.remove('highlight'));
+}
 
 generateTable();

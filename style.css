@@ -188,6 +188,16 @@ button#processButton:hover {
   color: white;
 }
 
+.viz-cell {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.viz-cell:hover {
+  background: var(--button-bg) !important;
+  color: var(--button-text);
+}
+
 .app-footer {
   margin-top: 2rem;
   text-align: center;

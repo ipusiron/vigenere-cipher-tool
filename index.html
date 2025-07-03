@@ -34,15 +34,15 @@
       <option value="decrypt">復号</option>
     </select>
 
+    <label for="inputText">平文（暗号化時）/ 暗号文（復号時）:</label>
+    <textarea id="inputText" rows="5" placeholder="ここにテキストを入力"></textarea>
+
     <label for="key">鍵（英字）:</label>
     <input type="text" id="key" placeholder="例: LEMON" />
 
-    <label for="inputText">入力テキスト:</label>
-    <textarea id="inputText" rows="5" placeholder="ここに平文または暗号文を入力"></textarea>
-
     <button id="processButton">実行</button>
 
-    <label for="outputText">出力結果:</label>
+    <label for="outputText">出力:</label>
     <textarea id="outputText" rows="5" readonly></textarea>
 
     <div id="visualization"></div>
