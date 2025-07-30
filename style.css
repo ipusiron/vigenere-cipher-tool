@@ -250,6 +250,103 @@ label {
   color: #ff6b6b;
 }
 
+/* File Input Container */
+.input-container {
+  margin-bottom: 1rem;
+}
+
+.label-with-file-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.label-with-file-button label {
+  margin-bottom: 0;
+}
+
+.file-select-button {
+  background: var(--viz-cell-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius);
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: all var(--transition-speed);
+  margin: 0;
+}
+
+.file-select-button:hover {
+  background: var(--button-bg);
+  color: var(--button-text);
+  transform: translateY(-1px);
+}
+
+.file-select-button svg {
+  pointer-events: none;
+}
+
+/* Drag and Drop Zone */
+.textarea-drop-zone {
+  position: relative;
+}
+
+.textarea-drop-zone.drag-over {
+  border-radius: var(--border-radius);
+}
+
+.textarea-drop-zone.drag-over textarea {
+  border-color: var(--button-bg);
+  border-width: 2px;
+  border-style: dashed;
+}
+
+.drop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 123, 255, 0.1);
+  border: 2px dashed var(--button-bg);
+  border-radius: var(--border-radius);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.textarea-drop-zone.drag-over .drop-overlay {
+  display: flex;
+}
+
+.drop-message {
+  text-align: center;
+  color: var(--button-bg);
+  font-weight: 500;
+}
+
+.drop-message svg {
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+}
+
+.drop-message p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+[data-theme="dark"] .drop-overlay {
+  background: rgba(0, 170, 255, 0.15);
+}
+
 select,
 input,
 textarea,

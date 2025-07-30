@@ -18,7 +18,11 @@ const elements = {
   modalClose: () => document.querySelector('.modal-close'),
   copyButton: () => document.getElementById('copyButton'),
   copyToast: () => document.getElementById('copyToast'),
-  keyWarning: () => document.getElementById('keyWarning')
+  keyWarning: () => document.getElementById('keyWarning'),
+  fileInput: () => document.getElementById('fileInput'),
+  fileSelectButton: () => document.getElementById('fileSelectButton'),
+  textareaDropZone: () => document.getElementById('textareaDropZone'),
+  dropOverlay: () => document.getElementById('dropOverlay')
 };
 
 // Utility Functions
@@ -402,6 +406,116 @@ const handleKeyInput = (event) => {
   }
 };
 
+// File Functions
+const validateFile = (file) => {
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  const allowedTypes = ['text/plain', ''];
+  
+  if (file.size > maxSize) {
+    throw new Error(`ファイルサイズが大きすぎます（最大: ${maxSize / 1024 / 1024}MB）`);
+  }
+  
+  // Allow common text file extensions
+  const fileName = file.name.toLowerCase();
+  const isTextFile = fileName.endsWith('.txt') || 
+                    fileName.endsWith('.text') || 
+                    file.type === 'text/plain' ||
+                    file.type === '';
+  
+  if (!isTextFile) {
+    throw new Error('テキストファイル（.txt）のみサポートしています');
+  }
+  
+  return true;
+};
+
+const readFileAsText = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+      try {
+        let content = event.target.result;
+        
+        // Basic sanitization
+        content = sanitizeUrlText(content);
+        
+        resolve(content);
+      } catch (error) {
+        reject(new Error('ファイルの読み込み中にエラーが発生しました'));
+      }
+    };
+    
+    reader.onerror = () => {
+      reject(new Error('ファイルの読み込みに失敗しました'));
+    };
+    
+    reader.readAsText(file, 'UTF-8');
+  });
+};
+
+const handleFileLoad = async (file) => {
+  try {
+    validateFile(file);
+    const content = await readFileAsText(file);
+    
+    if (content.trim()) {
+      elements.inputText().value = content;
+      console.log('ファイルが正常に読み込まれました:', file.name);
+    } else {
+      throw new Error('ファイルが空です');
+    }
+  } catch (error) {
+    console.error('ファイル処理エラー:', error);
+    alert(error.message);
+  }
+};
+
+const handleFileSelect = () => {
+  elements.fileInput().click();
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    handleFileLoad(file);
+  }
+  // Reset file input
+  event.target.value = '';
+};
+
+// Drag and Drop Functions
+const handleDragOver = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  elements.textareaDropZone().classList.add('drag-over');
+};
+
+const handleDragLeave = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  // Only remove class if we're leaving the drop zone entirely
+  const rect = elements.textareaDropZone().getBoundingClientRect();
+  const x = event.clientX;
+  const y = event.clientY;
+  
+  if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+    elements.textareaDropZone().classList.remove('drag-over');
+  }
+};
+
+const handleDrop = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  elements.textareaDropZone().classList.remove('drag-over');
+  
+  const files = event.dataTransfer.files;
+  if (files.length > 0) {
+    handleFileLoad(files[0]);
+  }
+};
+
 // Event Listeners
 const initEventListeners = () => {
   elements.processButton().addEventListener('click', processText);
@@ -427,6 +541,20 @@ const initEventListeners = () => {
   
   // Key input handling for real-time conversion and validation
   elements.key().addEventListener('input', handleKeyInput);
+  
+  // File input event listeners
+  elements.fileSelectButton().addEventListener('click', handleFileSelect);
+  elements.fileInput().addEventListener('change', handleFileChange);
+  
+  // Drag and drop event listeners
+  const dropZone = elements.textareaDropZone();
+  dropZone.addEventListener('dragover', handleDragOver);
+  dropZone.addEventListener('dragleave', handleDragLeave);
+  dropZone.addEventListener('drop', handleDrop);
+  
+  // Prevent default drag behaviors on document
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  document.addEventListener('drop', (e) => e.preventDefault());
 };
 
 // Initialize
