@@ -148,6 +148,108 @@ label {
   display: block;
 }
 
+/* Output Container with Copy Button */
+.output-container {
+  margin-bottom: 1rem;
+}
+
+.label-with-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.label-with-button label {
+  margin-bottom: 0;
+}
+
+.button-container {
+  position: relative;
+}
+
+.copy-button {
+  background: var(--viz-cell-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius);
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: all var(--transition-speed);
+  margin: 0;
+}
+
+.copy-button:hover {
+  background: var(--button-bg);
+  color: var(--button-text);
+  transform: translateY(-1px);
+}
+
+.copy-button svg {
+  pointer-events: none;
+}
+
+/* Toast Notification */
+.copy-toast {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: var(--button-bg);
+  color: var(--button-text);
+  padding: 6px 12px;
+  border-radius: var(--border-radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all var(--transition-speed);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.copy-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.copy-toast::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 16px;
+  border: 5px solid transparent;
+  border-top-color: var(--button-bg);
+}
+
+/* Warning Message */
+.warning-message {
+  font-size: 0.85rem;
+  color: #e74c3c;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.3rem 0;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all var(--transition-speed);
+  display: none;
+}
+
+.warning-message.show {
+  opacity: 1;
+  transform: translateY(0);
+  display: block;
+}
+
+[data-theme="dark"] .warning-message {
+  color: #ff6b6b;
+}
+
 select,
 input,
 textarea,

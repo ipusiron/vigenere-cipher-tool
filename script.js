@@ -15,7 +15,10 @@ const elements = {
   themeToggle: () => document.getElementById('theme-toggle'),
   helpToggle: () => document.getElementById('help-toggle'),
   helpModal: () => document.getElementById('help-modal'),
-  modalClose: () => document.querySelector('.modal-close')
+  modalClose: () => document.querySelector('.modal-close'),
+  copyButton: () => document.getElementById('copyButton'),
+  copyToast: () => document.getElementById('copyToast'),
+  keyWarning: () => document.getElementById('keyWarning')
 };
 
 // Utility Functions
@@ -274,6 +277,131 @@ const handleEscKey = (event) => {
   }
 };
 
+// Copy Functions
+const copyToClipboard = async () => {
+  const outputText = elements.outputText().value;
+  
+  if (!outputText.trim()) {
+    return;
+  }
+  
+  try {
+    await navigator.clipboard.writeText(outputText);
+    showToast();
+  } catch (err) {
+    // Fallback for older browsers
+    const textArea = elements.outputText();
+    textArea.select();
+    textArea.setSelectionRange(0, 99999);
+    
+    try {
+      document.execCommand('copy');
+      showToast();
+    } catch (fallbackErr) {
+      console.error('Failed to copy text: ', fallbackErr);
+    }
+  }
+};
+
+const showToast = () => {
+  const toast = elements.copyToast();
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2000);
+};
+
+// URL Parameter Functions
+const getUrlParameter = (name) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+};
+
+const sanitizeUrlText = (text) => {
+  if (!text) return '';
+  
+  // Limit text length for security (max 10000 characters)
+  const maxLength = 10000;
+  if (text.length > maxLength) {
+    console.warn(`URL parameter text truncated to ${maxLength} characters`);
+    text = text.substring(0, maxLength);
+  }
+  
+  // Basic HTML entity escaping to prevent XSS
+  const htmlEscapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;'
+  };
+  
+  // Escape HTML entities
+  text = text.replace(/[&<>"'/]/g, (match) => htmlEscapeMap[match]);
+  
+  // Remove any potentially dangerous characters
+  text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  
+  return text;
+};
+
+const loadTextFromUrl = () => {
+  try {
+    const encodedText = getUrlParameter('text');
+    if (!encodedText) return;
+    
+    // Decode URL-encoded text
+    const decodedText = decodeURIComponent(encodedText);
+    
+    // Sanitize the text for security
+    const sanitizedText = sanitizeUrlText(decodedText);
+    
+    if (sanitizedText) {
+      // Set the text in the input field
+      elements.inputText().value = sanitizedText;
+      
+      // Update the URL to remove the parameter (optional, for cleaner URL)
+      const url = new URL(window.location);
+      url.searchParams.delete('text');
+      window.history.replaceState({}, document.title, url.pathname + url.search);
+      
+      console.log('Text loaded from URL parameter');
+    }
+  } catch (error) {
+    console.error('Error loading text from URL parameter:', error);
+  }
+};
+
+// Key Input Functions
+const handleKeyInput = (event) => {
+  const input = event.target;
+  const originalValue = input.value;
+  const cursorPosition = input.selectionStart;
+  
+  // Convert to uppercase and remove non-alphabetic characters
+  const sanitizedValue = originalValue.toUpperCase().replace(/[^A-Z]/g, '');
+  
+  // Update input value
+  input.value = sanitizedValue;
+  
+  // Restore cursor position (adjust for removed characters)
+  const removedChars = originalValue.length - sanitizedValue.length;
+  const newCursorPosition = Math.max(0, cursorPosition - removedChars);
+  input.setSelectionRange(newCursorPosition, newCursorPosition);
+  
+  // Show/hide warning message
+  const hasNonAlphabetic = /[^A-Za-z]/.test(originalValue);
+  const warning = elements.keyWarning();
+  
+  if (hasNonAlphabetic && sanitizedValue !== originalValue) {
+    warning.classList.add('show');
+  } else {
+    warning.classList.remove('show');
+  }
+};
+
 // Event Listeners
 const initEventListeners = () => {
   elements.processButton().addEventListener('click', processText);
@@ -281,6 +409,7 @@ const initEventListeners = () => {
   elements.helpToggle().addEventListener('click', showModal);
   elements.modalClose().addEventListener('click', hideModal);
   elements.helpModal().addEventListener('click', handleModalClick);
+  elements.copyButton().addEventListener('click', copyToClipboard);
   document.addEventListener('keydown', handleEscKey);
   
   // Enter key support for input fields
@@ -295,6 +424,9 @@ const initEventListeners = () => {
       processText();
     }
   });
+  
+  // Key input handling for real-time conversion and validation
+  elements.key().addEventListener('input', handleKeyInput);
 };
 
 // Initialize
@@ -302,6 +434,7 @@ const init = () => {
   initTheme();
   generateTable();
   initEventListeners();
+  loadTextFromUrl();
 };
 
 // Start the application

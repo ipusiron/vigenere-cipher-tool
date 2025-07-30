@@ -48,14 +48,28 @@
 
     <label for="key">鍵（英字）:</label>
     <input type="text" id="key" placeholder="例: LEMON" />
+    <div id="keyWarning" class="warning-message">アルファベット以外は無視されます</div>
 
     <button id="processButton">実行</button>
 
     <label for="sanitizedText">処理対象テキスト（英字のみ）:</label>
     <textarea id="sanitizedText" rows="3" readonly></textarea>
 
-    <label for="outputText">出力:</label>
-    <textarea id="outputText" rows="5" readonly></textarea>
+    <div class="output-container">
+      <div class="label-with-button">
+        <label for="outputText">出力:</label>
+        <div class="button-container">
+          <button id="copyButton" class="copy-button" title="クリップボードにコピー">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+          <div id="copyToast" class="copy-toast">コピーしました！</div>
+        </div>
+      </div>
+      <textarea id="outputText" rows="5" readonly></textarea>
+    </div>
 
     <div id="visualization"></div>
     <div id="vigenereTable"></div>
