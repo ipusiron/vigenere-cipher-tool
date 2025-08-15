@@ -302,7 +302,7 @@ const copyToClipboard = async () => {
       document.execCommand('copy');
       showToast();
     } catch (fallbackErr) {
-      console.error('Failed to copy text: ', fallbackErr);
+      console.error('Copy operation failed');
     }
   }
 };
@@ -328,25 +328,31 @@ const sanitizeUrlText = (text) => {
   // Limit text length for security (max 10000 characters)
   const maxLength = 10000;
   if (text.length > maxLength) {
-    console.warn(`URL parameter text truncated to ${maxLength} characters`);
+    console.warn('Input text was truncated due to length limit');
     text = text.substring(0, maxLength);
   }
   
-  // Basic HTML entity escaping to prevent XSS
+  // Comprehensive HTML entity escaping to prevent XSS
   const htmlEscapeMap = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
     "'": '&#x27;',
-    '/': '&#x2F;'
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
   };
   
-  // Escape HTML entities
-  text = text.replace(/[&<>"'/]/g, (match) => htmlEscapeMap[match]);
+  // Escape HTML entities and additional dangerous characters
+  text = text.replace(/[&<>"'/`=]/g, (match) => htmlEscapeMap[match]);
   
-  // Remove any potentially dangerous characters
-  text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  // Remove control characters and other potentially dangerous characters
+  // This includes null bytes, control characters, and non-printable characters
+  text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
+  
+  // Additional protection: Remove javascript: and data: protocols
+  text = text.replace(/^(javascript|data|vbscript|file|about|blob):/gi, '');
   
   return text;
 };
@@ -374,7 +380,8 @@ const loadTextFromUrl = () => {
       console.log('Text loaded from URL parameter');
     }
   } catch (error) {
-    console.error('Error loading text from URL parameter:', error);
+    console.error('Failed to load URL parameter');
+    // Don't expose detailed error to user
   }
 };
 
@@ -412,7 +419,7 @@ const validateFile = (file) => {
   const allowedTypes = ['text/plain', ''];
   
   if (file.size > maxSize) {
-    throw new Error(`ファイルサイズが大きすぎます（最大: ${maxSize / 1024 / 1024}MB）`);
+    throw new Error('ファイルサイズが大きすぎます（最大: 10MB）');
   }
   
   // Allow common text file extensions
@@ -442,7 +449,7 @@ const readFileAsText = (file) => {
         
         resolve(content);
       } catch (error) {
-        reject(new Error('ファイルの読み込み中にエラーが発生しました'));
+        reject(new Error('ファイルの処理に失敗しました'));
       }
     };
     
@@ -466,8 +473,8 @@ const handleFileLoad = async (file) => {
       throw new Error('ファイルが空です');
     }
   } catch (error) {
-    console.error('ファイル処理エラー:', error);
-    alert(error.message);
+    console.error('File processing error');
+    alert(error.message || 'ファイルの処理に失敗しました');
   }
 };
 
