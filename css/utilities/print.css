@@ -1,0 +1,36 @@
+/**
+ * Print Styles
+ * 印刷用スタイル
+ */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .container {
+    box-shadow: none;
+    max-width: 100%;
+  }
+  
+  .header-buttons,
+  .app-footer,
+  .modal {
+    display: none;
+  }
+  
+  #visualization,
+  #vigenereTable {
+    break-inside: avoid;
+  }
+  
+  /* ページ分割の調整 */
+  .experiment-section {
+    break-inside: avoid;
+  }
+  
+  .tab-navigation {
+    break-after: avoid;
+  }
+}

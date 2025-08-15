@@ -1,0 +1,71 @@
+/**
+ * Icon Components
+ * アイコンコンポーネント
+ */
+
+/* アイコンベーススタイル */
+.theme-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* テーマ切り替えアイコン */
+.sun-icon {
+  display: none;
+}
+
+[data-theme="dark"] .sun-icon {
+  display: block;
+}
+
+[data-theme="dark"] .moon-icon {
+  display: none;
+}
+
+/* ツールチップ */
+.tooltip-container {
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--spacing-sm) var(--spacing-sm);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  border-radius: var(--border-radius);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: var(--z-tooltip);
+  margin-bottom: var(--spacing-xs);
+  font-family: var(--font-mono);
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+
+[data-theme="dark"] .tooltip {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #121212;
+}
+
+[data-theme="dark"] .tooltip::after {
+  border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
+}

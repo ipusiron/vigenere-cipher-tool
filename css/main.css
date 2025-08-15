@@ -1,0 +1,30 @@
+/**
+ * Main Stylesheet - Modular Architecture
+ * メインスタイルシート - モジュラーアーキテクチャ
+ */
+
+/* === Foundation Layer === */
+/* 基盤レイヤー：変数とテーマ */
+@import 'base/variables.css';
+@import 'themes/light.css';
+@import 'themes/dark.css';
+
+/* === Layout Layer === */
+/* レイアウトレイヤー：構造とレイアウト */
+@import 'layout/container.css';
+@import 'layout/grid.css';
+
+/* === Component Layer === */
+/* コンポーネントレイヤー：UI部品 */
+@import 'components/buttons.css';
+@import 'components/forms.css';
+@import 'components/tabs.css';
+@import 'components/messages.css';
+@import 'components/tables.css';
+@import 'components/modal.css';
+@import 'components/icons.css';
+
+/* === Utility Layer === */
+/* ユーティリティレイヤー：汎用機能 */
+@import 'utilities/animations.css';
+@import 'utilities/print.css';

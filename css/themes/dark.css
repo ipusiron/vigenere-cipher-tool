@@ -1,0 +1,37 @@
+/**
+ * Dark Theme
+ * ダークテーマの色定義
+ */
+
+[data-theme="dark"] {
+  /* Primary colors */
+  --bg-color: #121212;
+  --text-color: #f0f0f0;
+  --container-bg: #1e1e1e;
+  
+  /* Interactive elements */
+  --input-bg: #222222;
+  --input-border: #555555;
+  --button-bg: #007acc;
+  --button-text: #ffffff;
+  --link-color: #00aaff;
+  
+  /* Visualization elements */
+  --viz-header-bg: #444444;
+  --viz-cell-bg: #333333;
+  --table-border: #666666;
+  --table-header-bg: #333333;
+  
+  /* Message colors */
+  --message-warning-text: #d1a827;
+  --message-warning-bg: #2d2014;
+  --message-warning-border: #664d03;
+  
+  --message-error-text: #ff6b6b;
+  --message-error-bg: #2c1417;
+  --message-error-border: #842029;
+  
+  /* Tooltip colors */
+  --tooltip-bg: rgba(255, 255, 255, 0.95);
+  --tooltip-text: #121212;
+}

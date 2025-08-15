@@ -1,0 +1,78 @@
+/**
+ * Container Layout
+ * コンテナとページレイアウト
+ */
+
+/* ベースレイアウト */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-system);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: var(--spacing-xl);
+  line-height: var(--leading-normal);
+  margin: 0;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+/* メインコンテナ */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  background: var(--container-bg);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow);
+}
+
+/* ヘッダーレイアウト */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.header-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+h1 {
+  text-align: center;
+  margin: 0;
+  font-size: var(--text-lg);
+  flex: 1;
+}
+
+/* フッターレイアウト */
+.app-footer {
+  margin-top: var(--spacing-xl);
+  text-align: center;
+  font-size: var(--text-sm);
+  opacity: 0.8;
+}
+
+/* レスポンシブレイアウト */
+@media (max-width: 600px) {
+  body {
+    padding: var(--spacing-md);
+  }
+  
+  .container {
+    padding: var(--spacing-lg);
+  }
+  
+  h1 {
+    font-size: var(--text-lg);
+  }
+  
+  .header-container {
+    justify-content: center;
+  }
+}

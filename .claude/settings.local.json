@@ -15,7 +15,8 @@
       "Bash(cp:*)",
       "Bash(git add:*)",
       "Bash(start http://localhost:8000)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

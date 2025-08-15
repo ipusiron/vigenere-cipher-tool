@@ -1,0 +1,82 @@
+/**
+ * Table Components
+ * テーブルコンポーネント（Vigenère square、可視化テーブル）
+ */
+
+/* 可視化テーブル */
+#visualization {
+  margin-top: var(--spacing-xl);
+  overflow-x: auto;
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+}
+
+#visualization h3 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+}
+
+.viz-row .viz-cell:hover {
+  background: var(--button-bg);
+  color: var(--button-text);
+  transform: translateY(-2px);
+}
+
+/* Vigenère テーブル */
+#vigenereTable {
+  margin-top: var(--spacing-xl);
+  overflow-x: auto;
+}
+
+#vigenereTable h3 {
+  margin-bottom: var(--spacing-md);
+}
+
+.vig-table {
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  margin: 0 auto;
+}
+
+.vig-table th,
+.vig-table td {
+  border: 1px solid var(--table-border);
+  padding: var(--spacing-xs) var(--spacing-xs);
+  text-align: center;
+  transition: all var(--transition-speed);
+}
+
+.vig-table th {
+  background: var(--table-header-bg);
+  font-weight: var(--font-bold);
+}
+
+.vig-table td.highlight,
+.vig-table th.highlight {
+  background: var(--button-bg);
+  color: var(--button-text);
+  font-weight: var(--font-bold);
+}
+
+/* テーブルセルのホバー効果とツールチップ */
+.vig-table td {
+  position: relative;
+  cursor: help;
+}
+
+.vig-table td:hover {
+  background-color: var(--viz-cell-bg);
+}
+
+/* レスポンシブテーブル調整 */
+@media (max-width: 600px) {
+  .vig-table {
+    font-size: var(--text-xs);
+  }
+  
+  .vig-table th,
+  .vig-table td {
+    padding: 2px 4px;
+  }
+}

@@ -1,0 +1,167 @@
+/**
+ * CSS Variables - Design System
+ * デザインシステムの基盤となるCSS変数定義
+ */
+
+:root {
+  /* === Color System === */
+  
+  /* Light theme colors */
+  --bg-color: #f0f0f0;
+  --text-color: #333;
+  --container-bg: #fff;
+  --input-bg: #fff;
+  --input-border: #ccc;
+  --button-bg: #007bff;
+  --button-text: #fff;
+  --link-color: #007bff;
+  --viz-header-bg: #e9ecef;
+  --viz-cell-bg: #f8f9fa;
+  --table-border: #dee2e6;
+  --table-header-bg: #f2f2f2;
+  
+  /* === Layout System === */
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 1rem;       /* 16px */
+  --spacing-lg: 1.5rem;     /* 24px */
+  --spacing-xl: 2rem;       /* 32px */
+  --spacing-2xl: 2.5rem;    /* 40px */
+  
+  /* Border radius */
+  --border-radius-sm: 2px;
+  --border-radius: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+  --border-radius-xl: 12px;
+  --border-radius-round: 50%;
+  
+  /* === Animation System === */
+  
+  /* Transition speeds */
+  --transition-fast: 0.15s;
+  --transition-speed: 0.3s;
+  --transition-slow: 0.5s;
+  
+  /* Easing functions */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  
+  /* === Shadow System === */
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+  
+  /* Legacy shadows (for backward compatibility) */
+  --box-shadow: var(--shadow-lg);
+  --modal-shadow: var(--shadow-2xl);
+  
+  /* === Typography System === */
+  
+  /* Font families */
+  --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Courier New', Consolas, Monaco, monospace;
+  
+  /* Font sizes */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.85rem;    /* 13.6px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  
+  /* Font weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* Line heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+  
+  /* === Z-Index System === */
+  
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+  
+  /* === Breakpoints === */
+  
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1536px;
+  
+  /* === Component Specific === */
+  
+  /* Button sizes */
+  --btn-height-sm: 32px;
+  --btn-height-md: 40px;
+  --btn-height-lg: 48px;
+  
+  /* Input sizes */
+  --input-height-sm: 32px;
+  --input-height-md: 40px;
+  --input-height-lg: 48px;
+  
+  /* Container max widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-max: 800px; /* Current app max-width */
+}
+
+/**
+ * Semantic Color Variables
+ * 意味的な色の定義（状態やコンテキスト）
+ */
+:root {
+  /* State colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  
+  /* Success variants */
+  --success-50: #ecfdf5;
+  --success-100: #d1fae5;
+  --success-500: var(--color-success);
+  --success-900: #064e3b;
+  
+  /* Warning variants */
+  --warning-50: #fffbeb;
+  --warning-100: #fef3c7;
+  --warning-500: var(--color-warning);
+  --warning-900: #78350f;
+  
+  /* Error variants */
+  --error-50: #fef2f2;
+  --error-100: #fee2e2;
+  --error-500: var(--color-error);
+  --error-900: #7f1d1d;
+  
+  /* Info variants */
+  --info-50: #eff6ff;
+  --info-100: #dbeafe;
+  --info-500: var(--color-info);
+  --info-900: #1e3a8a;
+}

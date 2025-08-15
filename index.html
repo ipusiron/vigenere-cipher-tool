@@ -5,16 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ヴィジュネル暗号ツール（Vigenere Cipher Tool）</title>
   
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
   <!-- Security Headers -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body>
-  <div class="container">
+  <div class="container" x-data="{ activeTab: 'cipher' }">
     <div class="header-container">
       <h1>ヴィジュネル暗号ツール<br>（Vigenere Cipher Tool）</h1>
       <div class="header-buttons">
@@ -44,6 +48,30 @@
       </div>
     </div>
 
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button 
+        @click="activeTab = 'cipher'" 
+        :class="{ 'active': activeTab === 'cipher' }"
+        class="tab-button">
+        暗号化・復号
+      </button>
+      <button 
+        @click="activeTab = 'tabula'" 
+        :class="{ 'active': activeTab === 'tabula' }"
+        class="tab-button">
+        タブラレクタ研究
+      </button>
+      <button 
+        @click="activeTab = 'lab'" 
+        :class="{ 'active': activeTab === 'lab' }"
+        class="tab-button">
+        実験室
+      </button>
+    </div>
+
+    <!-- Tab 1: 暗号化・復号 -->
+    <div x-show="activeTab === 'cipher'" class="tab-content">
     <label for="mode">モード選択:</label>
     <select id="mode">
       <option value="encrypt">暗号化</option>
@@ -64,7 +92,7 @@
         </button>
       </div>
       <div class="textarea-drop-zone" id="textareaDropZone">
-        <textarea id="inputText" rows="5" placeholder="ここにテキストを入力、またはファイルをドラッグ＆ドロップ"></textarea>
+        <textarea id="inputText" rows="5" placeholder="ここにテキストを入力、またはファイルをドラッグ＆ドロップ" oninput="validateMainInputs()"></textarea>
         <div class="drop-overlay" id="dropOverlay">
           <div class="drop-message">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -77,12 +105,14 @@
       </div>
       <input type="file" id="fileInput" accept=".txt,.text" style="display: none;">
     </div>
+    <div id="inputTextWarning" class="warning-message" style="display: none;"></div>
+    <div id="inputTextError" class="error-message" style="display: none;"></div>
 
     <label for="key">鍵（英字）:</label>
-    <input type="text" id="key" placeholder="例: LEMON" />
-    <div id="keyWarning" class="warning-message">アルファベット以外は無視されます</div>
+    <input type="text" id="key" placeholder="例: LEMON" oninput="validateMainInputs()" />
+    <div id="keyWarning" class="warning-message" style="display: none;">アルファベット以外は無視されます</div>
 
-    <button id="processButton">実行</button>
+    <button id="processButton" disabled>実行</button>
 
     <label for="sanitizedText">処理対象テキスト（英字のみ）:</label>
     <textarea id="sanitizedText" rows="3" readonly></textarea>
@@ -105,6 +135,237 @@
 
     <div id="visualization"></div>
     <div id="vigenereTable"></div>
+    </div>
+
+    <!-- Tab 2: タブラレクタ研究 -->
+    <div x-show="activeTab === 'tabula'" class="tab-content" style="display: none;">
+      <p>ヴィジュネル表（タブラレクタ）を使って、文字の換字変換を研究します。</p>
+      
+      <div style="margin: 1rem 0; padding: 1rem; background-color: var(--viz-cell-bg); border-radius: var(--border-radius); border: 1px solid var(--input-border);">
+        <strong>📖 表の見方：</strong>
+        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+          <li><strong>上部の行（横）</strong>：平文文字（A〜Z）</li>
+          <li><strong>左側の列（縦）</strong>：鍵文字（A〜Z）</li>
+          <li><strong>交差する場所</strong>：暗号文字</li>
+        </ul>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
+          例：平文「H」＋鍵「K」→ 上部で「H」の列、左側で「K」の行を探し、交差する文字「R」が暗号文<br>
+          <span style="font-family: 'Courier New', monospace; background-color: rgba(0, 0, 0, 0.1); padding: 0.2rem 0.4rem; border-radius: 3px; margin-left: 1.5rem;">
+            R←shift(H, K)
+          </span>
+        </p>
+      </div>
+      
+      <div id="researchTable"></div>
+      
+      <h3>平文文字と鍵文字から、暗号文文字を計算する</h3>
+      
+      <div class="tabula-research">
+        <div class="research-controls">
+          <label for="plainChar">
+            平文文字:
+            <select id="plainChar" x-model="plainChar">
+            <option value="">選択</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+            <option value="K">K</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="N">N</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="Q">Q</option>
+            <option value="R">R</option>
+            <option value="S">S</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+            </select>
+          </label>
+          
+          <label for="keyChar">
+            鍵文字:
+            <select id="keyChar" x-model="keyChar">
+            <option value="">選択</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+            <option value="K">K</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="N">N</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="Q">Q</option>
+            <option value="R">R</option>
+            <option value="S">S</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+            </select>
+          </label>
+          
+          <button onclick="researchTabula()">計算</button>
+          
+          <div id="researchCipherResult" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            <span>暗号文文字:</span>
+            <span id="cipherCharResult" style="font-weight: bold; font-size: 1.2rem; color: var(--button-bg);">―</span>
+          </div>
+        </div>
+        
+        <div id="researchResult" class="research-result"></div>
+      </div>
+      
+      <h3>平文文字と暗号文文字から、鍵文字を計算する</h3>
+      
+      <div class="tabula-research">
+        <div class="research-controls">
+          <label for="plainCharReverse">
+            平文文字:
+            <select id="plainCharReverse" x-model="plainCharReverse">
+            <option value="">選択</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+            <option value="K">K</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="N">N</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="Q">Q</option>
+            <option value="R">R</option>
+            <option value="S">S</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+            </select>
+          </label>
+          
+          <label for="cipherCharReverse">
+            暗号文文字:
+            <select id="cipherCharReverse" x-model="cipherCharReverse">
+            <option value="">選択</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+            <option value="K">K</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="N">N</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="Q">Q</option>
+            <option value="R">R</option>
+            <option value="S">S</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+            </select>
+          </label>
+          
+          <button onclick="researchReverseTabula()">計算</button>
+          
+          <div id="researchReverseKeyResult" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            <span>鍵文字:</span>
+            <span id="keyCharReverseResult" style="font-weight: bold; font-size: 1.2rem; color: var(--button-bg);">―</span>
+          </div>
+        </div>
+        
+        <div id="researchReverseResult" class="research-result"></div>
+      </div>
+    </div>
+
+    <!-- Tab 3: ヴィジュネル暗号実験室 -->
+    <div x-show="activeTab === 'lab'" class="tab-content" style="display: none;">
+      <div class="experiment-section">
+        <h3>実験1: シーザー暗号との関係</h3>
+        <p>鍵が1文字の場合、ヴィジュネル暗号はシーザー暗号と同じになります。</p>
+        
+        <div class="experiment-controls">
+          <label for="caesarText">平文:</label>
+          <input type="text" id="caesarText" placeholder="HELLO WORLD" 
+                 oninput="validateCaesarInputs()">
+          <div id="caesarTextError" class="error-message" style="display: none;"></div>
+          
+          <label for="caesarKey">鍵（1文字）:</label>
+          <input type="text" id="caesarKey" maxlength="1" placeholder="K" 
+                 oninput="validateCaesarInputs()">
+          <div id="caesarKeyError" class="error-message" style="display: none;"></div>
+          
+          <button id="caesarButton" onclick="experimentCaesar()">実験する</button>
+        </div>
+        
+        <div id="caesarResult" class="experiment-result"></div>
+      </div>
+      
+      <div class="experiment-section">
+        <h3>実験2: ワンタイムパッドとの関係</h3>
+        <p>鍵の長さが平文と同じでランダムな場合、理論上解読不可能な暗号（ワンタイムパッド）になります。</p>
+        
+        <div class="experiment-controls">
+          <label for="otpText">平文:</label>
+          <input type="text" id="otpText" placeholder="SECRET" 
+                 oninput="validateOTPInputs()">
+          <div id="otpTextError" class="error-message" style="display: none;"></div>
+          
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label for="otpKey">鍵（平文と同じ長さ）:</label>
+            <button id="generateKeyButton" onclick="generateRandomKey()">ランダム鍵生成</button>
+          </div>
+          <input type="text" id="otpKey" placeholder="自動生成されます" readonly>
+          
+          <button id="otpButton" onclick="experimentOTP()">実験する</button>
+        </div>
+        
+        <div id="otpResult" class="experiment-result"></div>
+      </div>
+    </div>
   </div>
 
     <footer class="app-footer">
@@ -117,48 +378,96 @@
   <div id="help-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>ヴィジュネル暗号ツールの使い方</h2>
+        <h2>🔐 ヴィジュネル暗号ツール - 完全ガイド</h2>
         <button class="modal-close" aria-label="閉じる">&times;</button>
       </div>
       <div class="modal-body">
         <h3>概要</h3>
-        <p>ヴィジュネル暗号は、16世紀に考案された多表式換字暗号です。鍵となる単語を使って平文を暗号化します。</p>
+        <p>ヴィジュネル暗号は、16世紀に考案された多表式換字暗号です。このツールでは暗号化・復号だけでなく、暗号の仕組みを研究・実験できます。</p>
         
-        <h3>使い方</h3>
+        <h3>📝 タブ1: 暗号化・復号</h3>
+        <strong>基本的な使い方:</strong>
         <ol>
-          <li><strong>モード選択</strong>: 「暗号化」または「復号」を選択します</li>
-          <li><strong>テキスト入力</strong>: 暗号化したい平文、または復号したい暗号文を入力します
+          <li><strong>モード選択</strong>: 「暗号化」または「復号」を選択</li>
+          <li><strong>テキスト入力</strong>: 平文または暗号文を入力
             <ul>
-              <li>英字以外の文字（数字、記号、空白など）は自動的に除外されます</li>
-              <li>大文字・小文字は区別されません</li>
+              <li>📁 ファイル選択アイコンでテキストファイル読み込み</li>
+              <li>ドラッグ&ドロップでファイル読み込み対応</li>
+              <li>英字以外は自動的に除外されます</li>
             </ul>
           </li>
-          <li><strong>鍵の入力</strong>: 暗号化・復号に使用する鍵を英字で入力します（例: LEMON）</li>
-          <li><strong>実行</strong>: 「実行」ボタンをクリックすると結果が表示されます</li>
+          <li><strong>鍵の入力</strong>: 暗号化・復号に使用する鍵を英字で入力（例: LEMON）</li>
+          <li><strong>実行</strong>: 「実行」ボタンをクリックして結果を表示</li>
+          <li><strong>結果コピー</strong>: 📋 コピーアイコンでワンクリックコピー</li>
         </ol>
         
-        <h3>機能説明</h3>
+        <strong>視覚化機能:</strong>
         <ul>
-          <li><strong>処理対象テキスト</strong>: 実際に暗号化・復号される英字のみのテキストが表示されます</li>
-          <li><strong>対応関係の可視化</strong>: 各文字の変換過程が表示されます
-            <ul>
-              <li>マウスを合わせると、ヴィジュネル表の対応する部分がハイライトされます</li>
-            </ul>
-          </li>
-          <li><strong>ヴィジュネル表</strong>: 暗号化・復号に使用される26×26の換字表です</li>
+          <li><strong>処理対象テキスト</strong>: 実際に処理される英字のみのテキスト表示</li>
+          <li><strong>対応関係の可視化</strong>: 平文・鍵・出力の文字対応を表形式で表示</li>
+          <li><strong>インタラクティブハイライト</strong>: セルにマウスを合わせると、ヴィジュネル表の該当部分をハイライト</li>
+          <li><strong>ヴィジュネル表（タブラレクタ）</strong>: 26×26の完全な換字表を常時表示</li>
         </ul>
         
-        <h3>暗号化の仕組み</h3>
-        <p>各文字は以下の手順で変換されます：</p>
+        <h3>🔬 タブ2: タブラレクタ研究</h3>
+        <p>ヴィジュネル表を使った文字変換の仕組みを詳しく研究できます。</p>
+        <ul>
+          <li><strong>暗号化研究</strong>: 平文文字と鍵文字を選択して、暗号文字を計算</li>
+          <li><strong>復号研究</strong>: 平文文字と暗号文字から、使用された鍵文字を逆算</li>
+          <li><strong>数式表示</strong>: モジュロ26演算の詳細な計算過程を表示</li>
+          <li><strong>ハイライト機能</strong>: 選択した文字組み合わせをヴィジュネル表でハイライト</li>
+        </ul>
+        
+        <h3>🧪 タブ3: 実験室</h3>
+        <p>ヴィジュネル暗号の特殊なケースや関連する暗号を実験できます。</p>
+        
+        <strong>シーザー暗号実験:</strong>
+        <ul>
+          <li>1文字の鍵を使用したヴィジュネル暗号 = シーザー暗号</li>
+          <li>鍵の長さによる暗号の性質の違いを観察</li>
+        </ul>
+        
+        <strong>ワンタイムパッド実験:</strong>
+        <ul>
+          <li>平文と同じ長さのランダム鍵を自動生成</li>
+          <li>理論上解読不可能な暗号化を体験</li>
+          <li>文字ごとの対応関係を詳細に可視化</li>
+        </ul>
+        
+        <h3>🎨 その他の機能</h3>
+        <ul>
+          <li><strong>ダークモード</strong>: 🌙 アイコンでライト/ダーク切り替え</li>
+          <li><strong>レスポンシブ対応</strong>: 長いテキストでも横スクロールで快適に表示</li>
+          <li><strong>固定ヘッダー</strong>: スクロール時も列ラベルが常に表示</li>
+          <li><strong>キーボードショートカット</strong>: Escキーでモーダルを閉じる</li>
+        </ul>
+        
+        <h3>⚡ 暗号化の仕組み</h3>
+        <p>各文字は以下の数学的手順で変換されます：</p>
         <ol>
-          <li>平文の文字と鍵の文字を対応させます（鍵は必要に応じて繰り返されます）</li>
-          <li>ヴィジュネル表で、平文の文字（列）と鍵の文字（行）の交点にある文字が暗号文になります</li>
-          <li>復号は逆の操作を行います</li>
+          <li><strong>文字コード変換</strong>: A=0, B=1, ..., Z=25</li>
+          <li><strong>モジュロ26演算</strong>:
+            <ul>
+              <li>暗号化: (平文 + 鍵) mod 26</li>
+              <li>復号: (暗号文 - 鍵 + 26) mod 26</li>
+            </ul>
+          </li>
+          <li><strong>鍵の循環</strong>: 鍵は平文の長さに合わせて繰り返し使用</li>
+          <li><strong>結果表示</strong>: 数値を再び文字に変換して出力</li>
         </ol>
+        
+        <h3>⚠️ セキュリティに関する注意</h3>
+        <p><strong>このツールは教育・学習目的です。</strong>ヴィジュネル暗号は現代のセキュリティ基準では安全ではありません：</p>
+        <ul>
+          <li>短い鍵は周期性により解読される可能性があります</li>
+          <li>頻度解析や既知平文攻撃に対して脆弱です</li>
+          <li>実際の機密情報の保護には使用しないでください</li>
+        </ul>
       </div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- New modular JavaScript architecture -->
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,45 @@
+/**
+ * Animation Utilities
+ * アニメーションユーティリティ
+ */
+
+/* フェードインアニメーション */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* アニメーションクラス */
+.fade-in {
+  animation: fadeIn var(--transition-speed) var(--ease-in);
+}
+
+.slide-in {
+  animation: slideIn var(--transition-speed) var(--ease-in-out);
+}
+
+/* ホバーアニメーション */
+.hover-lift:hover {
+  transform: translateY(-1px);
+}
+
+.hover-lift-2:hover {
+  transform: translateY(-2px);
+}

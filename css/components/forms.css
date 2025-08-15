@@ -1,0 +1,140 @@
+/**
+ * Form Components
+ * フォームコンポーネント
+ */
+
+/* フォーム要素ベーススタイル */
+label {
+  font-weight: var(--font-medium);
+  margin-bottom: var(--spacing-sm);
+  display: block;
+}
+
+select,
+input,
+textarea,
+button {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+textarea,
+input[type="text"],
+select {
+  padding: var(--spacing-sm);
+  background: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius);
+  font-family: inherit;
+  font-size: var(--text-base);
+  transition: border-color var(--transition-speed);
+}
+
+textarea:focus,
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--button-bg);
+}
+
+/* 特別なテキストエリア */
+#sanitizedText {
+  background: var(--viz-cell-bg);
+  font-family: var(--font-mono);
+  resize: none;
+}
+
+/* 入力コンテナ */
+.input-container {
+  margin-bottom: var(--spacing-md);
+}
+
+.output-container {
+  margin-bottom: var(--spacing-md);
+}
+
+/* ボタンコンテナ */
+.button-container {
+  position: relative;
+}
+
+/* リサーチコントロール内の選択要素 */
+.research-controls select {
+  padding: 0.4rem var(--spacing-sm);
+  font-size: var(--text-base);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  width: 75px;
+  text-align: center;
+  margin: 0;
+  box-sizing: border-box;
+  transform: translateY(0.5px);
+}
+
+.experiment-controls label {
+  margin-top: var(--spacing-sm);
+  font-weight: var(--font-medium);
+}
+
+.experiment-controls input {
+  padding: var(--spacing-sm);
+}
+
+/* ドラッグ&ドロップゾーン */
+.textarea-drop-zone {
+  position: relative;
+}
+
+.textarea-drop-zone.drag-over {
+  border-radius: var(--border-radius);
+}
+
+.textarea-drop-zone.drag-over textarea {
+  border-color: var(--button-bg);
+  border-width: 2px;
+  border-style: dashed;
+}
+
+.drop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 123, 255, 0.1);
+  border: 2px dashed var(--button-bg);
+  border-radius: var(--border-radius);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: var(--z-dropdown);
+}
+
+.textarea-drop-zone.drag-over .drop-overlay {
+  display: flex;
+}
+
+.drop-message {
+  text-align: center;
+  color: var(--button-bg);
+  font-weight: var(--font-medium);
+}
+
+.drop-message svg {
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.7;
+}
+
+.drop-message p {
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+[data-theme="dark"] .drop-overlay {
+  background: rgba(0, 170, 255, 0.15);
+}

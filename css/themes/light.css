@@ -1,0 +1,37 @@
+/**
+ * Light Theme
+ * ライトテーマの色定義
+ */
+
+:root {
+  /* Primary colors */
+  --bg-color: #f0f0f0;
+  --text-color: #333333;
+  --container-bg: #ffffff;
+  
+  /* Interactive elements */
+  --input-bg: #ffffff;
+  --input-border: #cccccc;
+  --button-bg: #007bff;
+  --button-text: #ffffff;
+  --link-color: #007bff;
+  
+  /* Visualization elements */
+  --viz-header-bg: #e9ecef;
+  --viz-cell-bg: #f8f9fa;
+  --table-border: #dee2e6;
+  --table-header-bg: #f2f2f2;
+  
+  /* Message colors */
+  --message-warning-text: #856404;
+  --message-warning-bg: #fff3cd;
+  --message-warning-border: #ffeaa7;
+  
+  --message-error-text: #dc3545;
+  --message-error-bg: #f8d7da;
+  --message-error-border: #f5c6cb;
+  
+  /* Tooltip colors */
+  --tooltip-bg: rgba(0, 0, 0, 0.9);
+  --tooltip-text: #ffffff;
+}

@@ -1,0 +1,126 @@
+/**
+ * Modal Components
+ * モーダルコンポーネント
+ */
+
+/* モーダルベース */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: var(--z-modal);
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn var(--transition-speed);
+}
+
+.modal-content {
+  background: var(--container-bg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--modal-shadow);
+  max-width: var(--container-md);
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn var(--transition-speed);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--input-border);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: var(--text-2xl);
+  cursor: pointer;
+  color: var(--text-color);
+  width: auto;
+  height: auto;
+  padding: 0;
+  line-height: 1;
+  margin: 0;
+  opacity: 0.7;
+  transition: opacity var(--transition-speed);
+}
+
+.modal-close:hover {
+  opacity: 1;
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+}
+
+.modal-body h3 {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--text-lg);
+}
+
+.modal-body h3:first-child {
+  margin-top: 0;
+}
+
+.modal-body p,
+.modal-body li {
+  line-height: 1.8;
+}
+
+.modal-body ul,
+.modal-body ol {
+  margin: var(--spacing-sm) 0;
+  padding-left: var(--spacing-lg);
+}
+
+.modal-body strong {
+  color: var(--button-bg);
+}
+
+/* モーダルアニメーション */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 印刷時にモーダルを隠す */
+@media print {
+  .modal {
+    display: none;
+  }
+}

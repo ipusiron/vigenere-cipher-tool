@@ -1,0 +1,100 @@
+/**
+ * Grid and Flexbox Layouts
+ * グリッドとフレックスボックスレイアウト
+ */
+
+/* フレックスボックスユーティリティ */
+.label-with-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.label-with-button label {
+  margin-bottom: 0;
+}
+
+.label-with-file-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.label-with-file-button label {
+  margin-bottom: 0;
+}
+
+/* 実験コントロールレイアウト */
+.experiment-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-lg) 0;
+}
+
+.research-controls {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  flex-wrap: nowrap;
+}
+
+.research-controls label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* 可視化テーブルレイアウト */
+.viz-table {
+  display: table;
+  width: max-content;
+  border-spacing: var(--spacing-xs);
+}
+
+.viz-row {
+  display: table-row;
+}
+
+.viz-row .header,
+.viz-row .viz-cell {
+  display: table-cell;
+  padding: var(--spacing-sm) 0.8rem;
+  text-align: center;
+  border-radius: var(--border-radius);
+  white-space: nowrap;
+}
+
+.viz-row .header {
+  font-weight: var(--font-bold);
+  background: var(--viz-header-bg);
+  position: sticky;
+  left: 0;
+  z-index: var(--z-sticky);
+  min-width: 60px;
+}
+
+.viz-row .viz-cell {
+  background: var(--viz-cell-bg);
+  min-width: 40px;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+/* レスポンシブグリッド調整 */
+@media (max-width: 600px) {
+  .viz-row .header {
+    min-width: 50px;
+    padding: 0.4rem;
+  }
+  
+  .viz-row .viz-cell {
+    padding: 0.4rem;
+    min-width: 30px;
+  }
+}

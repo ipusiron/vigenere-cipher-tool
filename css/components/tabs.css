@@ -1,0 +1,113 @@
+/**
+ * Tab Navigation Components
+ * タブナビゲーションコンポーネント
+ */
+
+/* タブナビゲーション */
+.tab-navigation {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 2px solid var(--input-border);
+  padding-bottom: 0;
+}
+
+.tab-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  border-bottom: 3px solid transparent;
+  transition: all var(--transition-speed) var(--ease-in-out);
+  position: relative;
+  bottom: -2px;
+}
+
+.tab-button:hover {
+  background-color: var(--viz-cell-bg);
+}
+
+.tab-button.active {
+  color: var(--button-bg);
+  border-bottom-color: var(--button-bg);
+  background-color: var(--container-bg);
+}
+
+.tab-content {
+  animation: fadeIn var(--transition-speed) var(--ease-in);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* タブ固有のスタイル */
+
+/* タブ2: 研究スタイル */
+.tabula-research {
+  margin-top: var(--spacing-lg);
+}
+
+.research-result {
+  padding: var(--spacing-md);
+  background-color: var(--viz-cell-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+}
+
+#researchCipherResult {
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+/* タブ3: 実験スタイル */
+.experiment-section {
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-lg);
+  background-color: var(--viz-cell-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--input-border);
+}
+
+.experiment-section h3 {
+  margin-top: 0;
+  color: var(--button-bg);
+}
+
+.experiment-result {
+  padding: var(--spacing-md);
+  background-color: var(--container-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius);
+  margin-top: var(--spacing-md);
+  min-height: 80px;
+  font-family: var(--font-mono);
+}
+
+.experiment-result .result-item {
+  margin: var(--spacing-sm) 0;
+  padding: var(--spacing-sm);
+  background-color: var(--viz-cell-bg);
+  border-radius: var(--border-radius);
+}
+
+.experiment-result .highlight-text {
+  color: var(--button-bg);
+  font-weight: var(--font-bold);
+}
