@@ -97,9 +97,9 @@ export const processText = () => {
   const { result, visualization } = vigenere(inputText, key, mode);
   mainTabElements.outputText().value = result;
   
-  // 可視化テーブルを表示
+  // 可視化テーブルを表示（モードを渡す）
   const visualizationContainer = mainTabElements.visualization();
-  const table = displayVisualization(visualizationContainer, visualization);
+  const table = displayVisualization(visualizationContainer, visualization, mode);
   
   // ホバーイベントリスナーを追加
   const cells = table.querySelectorAll('.viz-cell');

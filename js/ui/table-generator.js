@@ -253,16 +253,33 @@ export const createVisualizationRow = (label, data, key) => {
  * 可視化テーブルを表示
  * @param {HTMLElement} container - コンテナ要素
  * @param {Array} data - 可視化データ
+ * @param {string} mode - 'encrypt' or 'decrypt'
  */
-export const displayVisualization = (container, data) => {
-  container.innerHTML = '<h3>対応関係（平文＋鍵 → 出力）</h3>';
+export const displayVisualization = (container, data, mode = 'encrypt') => {
+  // モードに応じてタイトルを変更
+  const isEncrypt = mode === 'encrypt';
+  const title = isEncrypt 
+    ? '<h3>対応関係（平文＋鍵 → 出力）</h3>'
+    : '<h3>対応関係（暗号文＋鍵 → 出力）</h3>';
+  
+  container.innerHTML = title;
   
   const table = document.createElement('div');
   table.className = 'viz-table';
   
-  table.appendChild(createVisualizationRow('平文', data, 'plain'));
-  table.appendChild(createVisualizationRow('鍵', data, 'key'));
-  table.appendChild(createVisualizationRow('出力', data, 'result'));
+  // モードに応じて行の順序とラベルを変更
+  if (isEncrypt) {
+    // 暗号化モード: 平文（入力） → 鍵 → 暗号文（出力）
+    table.appendChild(createVisualizationRow('平文', data, 'plain'));
+    table.appendChild(createVisualizationRow('鍵', data, 'key'));
+    table.appendChild(createVisualizationRow('出力', data, 'result'));
+  } else {
+    // 復号モード: 暗号文（入力） → 鍵 → 平文（出力）
+    // cipher.jsでは、復号時: plain=出力(平文), result=入力(暗号文)
+    table.appendChild(createVisualizationRow('暗号文', data, 'result'));
+    table.appendChild(createVisualizationRow('鍵', data, 'key'));
+    table.appendChild(createVisualizationRow('出力', data, 'plain'));
+  }
   
   container.appendChild(table);
   

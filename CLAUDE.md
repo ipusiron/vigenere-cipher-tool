@@ -24,127 +24,77 @@ npx http-server -p 8000
 ### Testing and Validation
 ```bash
 # No automated tests exist - manual testing via browser console
-# Test cipher functionality (v2.0 modular):
+# Test cipher functionality:
 # 1. Open browser console (F12)
 # 2. Test: 
-#    const { vigenere } = await VigenereApp.modules.cipher();
+#    const { vigenere } = await import('./js/core/cipher.js');
 #    vigenere("HELLO", "KEY", "encrypt")  // Should return {result: "RIJVS", visualization: [...]}
 #    vigenere("RIJVS", "KEY", "decrypt")  // Should return {result: "HELLO", visualization: [...]}
-
-# Legacy testing (v1.0):
-# Switch to script-legacy.js in index.html, then:
-# vigenere("HELLO", "KEY", true)   // Should return "RIJVS"
-# vigenere("RIJVS", "KEY", false)  // Should return "HELLO"
 ```
 
-## New Modular Architecture (v2.0)
+## Architecture Overview
+
+### Module System (Alpine.js + ES6 Modules)
+The application uses Alpine.js for reactive UI and ES6 modules for code organization. Modules are dynamically loaded for each tab to optimize initial load performance.
 
 ### Core Logic Layer (`js/core/`)
-- **`cipher.js`** - Pure cryptographic functions
-  - `vigenere(text, key, mode)` - Main cipher implementation
-  - `encryptChar()`, `decryptChar()` - Single character operations
-  - `sanitize()`, `repeatKey()` - Utility functions
-  - `findKeyChar()` - Reverse calculation for research
-  
-- **`validation.js`** - Input validation logic
-  - `validateInputText()` - Main text validation with detailed results
-  - `validateKey()`, `validateFile()` - Specific validators
-  - `validateLabText()`, `validateCaesarKey()` - Lab experiment validators
-  
-- **`utils.js`** - General utility functions
-  - `getUrlParameter()`, `sanitizeUrlText()` - URL handling
-  - `readFileAsText()` - File processing
-  - `generateRandomKey()` - Random key generation
-  - `showMessage()`, `hideMessage()` - Message helpers
+- **cipher.js**: Pure cryptographic functions - vigenere encryption/decryption, character operations
+- **validation.js**: Input validation with detailed error messages and warnings
+- **utils.js**: Utilities for file handling, URL parameters, random key generation
 
 ### UI Management Layer (`js/ui/`)
-- **`dom-elements.js`** - Centralized DOM element access
-  - `mainTabElements`, `researchTabElements`, `labTabElements` - Element collections
-  - `getElementById()`, `elementExists()` - Safe element access
-  
-- **`message-display.js`** - Message display responsibilities
-  - `showWarning()`, `showError()`, `hideMessage()` - Message control
-  - `displayValidationMessage()` - Validation result display
-  - `showToast()` - Toast notifications
-  
-- **`table-generator.js`** - Table generation and interaction
-  - `generateVigenereTable()` - Main table generator
-  - `highlightTableCell()`, `clearTableHighlight()` - Cell highlighting
-  - `displayVisualization()` - Process visualization
-  
-- **`theme.js`** - Theme management
-  - `initTheme()`, `toggleTheme()` - Theme control
-  - `detectSystemTheme()` - System preference detection
-  - Theme persistence via localStorage
+- **dom-elements.js**: Centralized DOM element access with null-safety
+- **message-display.js**: Toast notifications, warnings, and error display
+- **table-generator.js**: Vigenère table (tabula recta) generation and interactive highlighting
+- **theme.js**: Dark/light theme switching with localStorage persistence
 
 ### Feature Layer (`js/features/`)
-- **`main-tab.js`** - Main encryption/decryption functionality
-  - `processText()` - Core cipher processing
-  - `validateMainInputs()` - Real-time input validation
-  - File drag & drop, URL parameter loading
-  
-- **`research-tab.js`** - Tabula recta research features
-  - `researchTabula()` - Forward calculation experiments
-  - `researchReverseTabula()` - Reverse calculation experiments
-  - Dynamic table generation and highlighting
-  
-- **`lab-tab.js`** - Cryptographic experiments
-  - `experimentCaesar()` - Caesar cipher comparison
-  - `experimentOTP()` - One-time pad demonstration
-  - Input validation for experimental parameters
+- **main-tab.js**: Main encryption/decryption with file I/O and visualization
+- **research-tab.js**: Interactive tabula recta research and reverse calculations
+- **lab-tab.js**: Caesar cipher and one-time pad experiments
 
-### Application Entry Point
-- **`js/app.js`** - Main application bootstrap
-  - Module loading and initialization
-  - Dynamic tab loading for performance
-  - Error handling and fallback mechanisms
-  - Debug utilities and version information
+### Key Implementation Details
 
-### Legacy Support
-- **`script-legacy.js`** - Original monolithic implementation (backup)
-- Switch between implementations by commenting/uncommenting script tags in index.html
+#### Character Processing Pipeline
+1. Input sanitization: Remove non-alphabetic characters
+2. Case normalization: Convert to uppercase
+3. Key repetition: Extend key to match text length
+4. Character-by-character transformation using modulo 26 arithmetic
 
-## Legacy Architecture (v1.0 - script-legacy.js)
+#### Interactive Visualization System
+- Mouse hover events trigger coordinated highlighting across:
+  - Character correspondence table (plaintext/key/ciphertext columns)
+  - 26x26 Vigenère square cells
+  - Real-time calculation display in research tab
 
-### Core Cipher Logic (script-legacy.js)
-- `vigenere(text, key, encrypt)` at script-legacy.js:10 - Main cipher implementation
-- `sanitize(str)` at script-legacy.js:2 - Removes non-alphabetic characters
-- `repeatKey(key, length)` at script-legacy.js:6 - Repeats key to match text length
+#### Security Headers and CSP
+The application implements Content Security Policy and security headers to prevent XSS attacks, though these are primarily educational given the tool's purpose.
 
-### UI State Management
-- `processInputs()` at script-legacy.js:32 - Main UI update handler
-- `createVisualizationTable()` at script-legacy.js:45 - Generates the character mapping visualization
-- `createVigenereSquare()` at script-legacy.js:93 - Builds the 26x26 tabula recta
-- Theme persistence via localStorage key: 'theme'
+## Important Implementation Notes
 
-### Event Handling
-- File input support at script-legacy.js:120-130
-- Drag & drop file handling at script-legacy.js:135-150
-- GET parameter support for text input (?text=VALUE)
-- Copy result functionality at script-legacy.js:115
-
-## Important Implementation Details
-
-### Character Processing
-- Only processes A-Z characters (case-insensitive)
-- Non-alphabetic characters are stripped during sanitization
-- Uses modulo 26 arithmetic for character shifting
-
-### Visualization Features
-- Interactive highlighting system connecting input/output characters to Vigenère square
-- Fixed header for table visualization (sticky positioning)
-- Responsive horizontal scrolling for long texts
-
-### Browser Compatibility Requirements
-- ES6+ JavaScript features (const, let, arrow functions, template literals)
-- CSS Grid and Flexbox support
+### Browser Compatibility
+- Requires ES6+ support (const, let, arrow functions, async/await, modules)
+- CSS Grid and Flexbox for layout
 - LocalStorage API for theme persistence
 
-## Security Considerations
+### File Handling
+- Supports both file input button and drag-and-drop
+- Text files only (.txt)
+- Maximum recommended file size: 1MB for performance
 
-This is a classical cipher used for educational purposes only. The Vigenère cipher is vulnerable to:
-- Kasiski examination for key length determination
-- Frequency analysis once key length is known
-- Known plaintext attacks
+### URL Parameters
+- `?text=VALUE` - Pre-populate input field with encoded text
+- Automatically sanitizes and validates URL input
 
-Never use this for actual encryption needs - it's a teaching tool for understanding classical cryptography.
+## Development Guidelines
+
+### When modifying cipher logic
+Check `js/core/cipher.js` for the vigenere function and ensure changes maintain backward compatibility with the visualization system.
+
+### When updating UI components
+Follow the existing modular pattern - UI logic in `js/ui/`, feature logic in `js/features/`, core algorithms in `js/core/`.
+
+### When adding new features
+1. Create appropriate module in the correct layer
+2. Update `js/app.js` if new initialization is needed
+3. Follow existing patterns for DOM element access via `dom-elements.js`
