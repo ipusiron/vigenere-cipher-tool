@@ -15,6 +15,23 @@ import { displayValidationMessage } from '../ui/message-display.js';
 let isInitialized = false;
 
 /**
+ * HTMLエスケープ（XSS対策）
+ * @param {string} str - エスケープする文字列
+ * @returns {string} エスケープされた文字列
+ */
+const escapeHtml = (str) => {
+  const htmlEscapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;'
+  };
+  return str.replace(/[&<>"'/]/g, (match) => htmlEscapeMap[match]);
+};
+
+/**
  * シーザー暗号入力の検証
  */
 export const validateCaesarInputs = () => {
@@ -79,10 +96,10 @@ export const experimentCaesar = () => {
   
   const sanitizedText = sanitize(text);
   const { result } = vigenere(text, key, 'encrypt');
-  
+
   resultDiv.innerHTML = `
     <div class="result-item">
-      <strong>入力:</strong> ${text}
+      <strong>入力:</strong> ${escapeHtml(text)}
     </div>
     <div class="result-item">
       <strong>処理対象（英字のみ）:</strong> ${sanitizedText}
