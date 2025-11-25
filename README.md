@@ -1,3 +1,40 @@
+<!--
+---
+id: day017
+slug: vigenere-cipher-tool
+
+title: "Vigenere Cipher Tool"
+
+subtitle_ja: "古典暗号を学ぶインタラクティブツール"
+subtitle_en: "Interactive tool for learning classical cryptography"
+
+description_ja: "ヴィジュネル暗号の暗号化・復号、タブラレクタ研究、シーザー暗号・ワンタイムパッドの実験ができる包括的な古典暗号学習ツール"
+description_en: "A comprehensive classical cryptography learning tool for Vigenère cipher encryption/decryption, tabula recta research, and experiments with Caesar cipher and one-time pad"
+
+category_ja:
+  - 古典暗号
+  - 換字式暗号
+category_en:
+  - Classical Cryptography
+  - Substitution Cipher
+
+difficulty: 3
+
+tags:
+  - vigenere-cipher
+  - classical-cryptography
+  - polyalphabetic-substitution-cipher
+  - tabula-recta
+  - caesar-cipher
+  - one-time-pad
+
+repo_url: "https://github.com/ipusiron/vigenere-cipher-tool"
+demo_url: "https://ipusiron.github.io/vigenere-cipher-tool/"
+
+hub: true
+---
+-->
+
 # ヴィジュネル暗号ツール（Vigenère Cipher Tool）
 
 **Day17 - 生成AIで作るセキュリティツール100**
@@ -247,7 +284,7 @@ python -m http.server 8000
 
 ## ⚠️ ヴィジュネル暗号の弱点
 
-ヴィジュネル暗号は、シーザー暗号を強化した多表式換字暗号として知られていますが、現代の観点からは以下のような明確な弱点を持ちます。
+ヴィジュネル暗号は、シーザー暗号を強化した多表式換字式暗号として知られていますが、現代の観点からは以下のような明確な弱点を持ちます。
 
 ### 鍵の繰り返しによる周期性
 
