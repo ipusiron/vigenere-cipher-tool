@@ -250,6 +250,8 @@ hub: true
 
 - [POLYALPHABETIC SUBSTITUTION PUZZLE 01【Cypher編】](https://akademeia.info/?p=36228)
   - A=1版のヴィジュネル表を利用。本ツールの「表モード: A=1」で対応可能。
+- [POLYALPHABETIC SUBSTITUTION PUZZLE 02【Cypher編】](https://akademeia.info/?p=36245)
+- [POLYALPHABETIC SUBSTITUTION PUZZLE 03【Cypher編】](https://akademeia.info/?p=36264)
 
 ### 🎤 ヴィジュネル暗号文の解読デモ
 
