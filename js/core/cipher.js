@@ -3,6 +3,8 @@
  * 純粋関数による暗号化・復号ロジック
  */
 
+import { getIndexingOffset } from './indexing-mode.js';
+
 // Constants
 export const ALPHABET_SIZE = 26;
 export const CHAR_CODE_A = 'A'.charCodeAt(0);
@@ -36,7 +38,9 @@ export const repeatKey = (key, length) => {
 export const encryptChar = (plainChar, keyChar) => {
   const plainCode = plainChar.charCodeAt(0) - CHAR_CODE_A;
   const keyCode = keyChar.charCodeAt(0) - CHAR_CODE_A;
-  return String.fromCharCode((plainCode + keyCode) % ALPHABET_SIZE + CHAR_CODE_A);
+  const offset = getIndexingOffset();
+  // A=0: (plain + key) % 26, A=1: (plain + key + 1) % 26
+  return String.fromCharCode((plainCode + keyCode + offset) % ALPHABET_SIZE + CHAR_CODE_A);
 };
 
 /**
@@ -48,7 +52,9 @@ export const encryptChar = (plainChar, keyChar) => {
 export const decryptChar = (cipherChar, keyChar) => {
   const cipherCode = cipherChar.charCodeAt(0) - CHAR_CODE_A;
   const keyCode = keyChar.charCodeAt(0) - CHAR_CODE_A;
-  return String.fromCharCode((cipherCode - keyCode + ALPHABET_SIZE) % ALPHABET_SIZE + CHAR_CODE_A);
+  const offset = getIndexingOffset();
+  // A=0: (cipher - key + 26) % 26, A=1: (cipher - key - 1 + 26) % 26
+  return String.fromCharCode((cipherCode - keyCode - offset + ALPHABET_SIZE) % ALPHABET_SIZE + CHAR_CODE_A);
 };
 
 /**
@@ -97,6 +103,8 @@ export const vigenere = (text, key, mode = 'encrypt') => {
 export const findKeyChar = (plainChar, cipherChar) => {
   const plainCode = plainChar.charCodeAt(0) - CHAR_CODE_A;
   const cipherCode = cipherChar.charCodeAt(0) - CHAR_CODE_A;
-  const keyCode = (cipherCode - plainCode + ALPHABET_SIZE) % ALPHABET_SIZE;
+  const offset = getIndexingOffset();
+  // A=0: (cipher - plain + 26) % 26, A=1: (cipher - plain - 1 + 26) % 26
+  const keyCode = (cipherCode - plainCode - offset + ALPHABET_SIZE) % ALPHABET_SIZE;
   return String.fromCharCode(keyCode + CHAR_CODE_A);
 };

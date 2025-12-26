@@ -67,6 +67,8 @@ export const labTabElements = {
  */
 export const uiElements = {
   themeToggle: () => document.getElementById('theme-toggle'),
+  indexingModeToggle: () => document.getElementById('indexing-mode-toggle'),
+  indexingModeLabel: () => document.getElementById('indexing-mode-label'),
   helpToggle: () => document.getElementById('help-toggle'),
   helpModal: () => document.getElementById('help-modal'),
   modalClose: () => document.querySelector('.modal-close')

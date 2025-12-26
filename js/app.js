@@ -4,9 +4,79 @@
  */
 
 import { initTheme, initThemeToggle } from './ui/theme.js';
-import { generateMainTable } from './ui/table-generator.js';
+import { generateMainTable, generateResearchTable } from './ui/table-generator.js';
 import { initMainTab } from './features/main-tab.js';
 import { uiElements } from './ui/dom-elements.js';
+import { getIndexingOffset, toggleIndexingMode } from './core/indexing-mode.js';
+import { encryptChar } from './core/cipher.js';
+
+/**
+ * インデックスモードトグルの初期化
+ */
+const initIndexingModeToggle = () => {
+  const toggle = uiElements.indexingModeToggle();
+  const label = uiElements.indexingModeLabel();
+
+  if (!toggle) {
+    console.warn('Indexing mode toggle not found');
+    return;
+  }
+
+  // 保存された設定を反映
+  const currentOffset = getIndexingOffset();
+  toggle.checked = (currentOffset === 1);
+  if (label) {
+    label.textContent = currentOffset === 0 ? 'A=0' : 'A=1';
+  }
+
+  // 変更イベントリスナー
+  toggle.addEventListener('change', () => {
+    const newOffset = toggleIndexingMode();
+    if (label) {
+      label.textContent = newOffset === 0 ? 'A=0' : 'A=1';
+    }
+
+    // テーブルを再生成
+    regenerateAllTables();
+
+    // 表の見方の例を更新
+    updateTableExample();
+
+    console.log(`Indexing mode switched to: A=${newOffset}`);
+  });
+
+  // 初期状態で例を更新
+  updateTableExample();
+};
+
+/**
+ * 全てのヴィジュネル表を再生成
+ */
+const regenerateAllTables = () => {
+  const mainTableContainer = document.getElementById('vigenereTable');
+  const researchTableContainer = document.getElementById('researchTable');
+
+  if (mainTableContainer) {
+    generateMainTable(mainTableContainer);
+  }
+  if (researchTableContainer) {
+    generateResearchTable(researchTableContainer);
+  }
+};
+
+/**
+ * 表の見方の例を更新（H + K の結果）
+ */
+const updateTableExample = () => {
+  const resultSpan = document.getElementById('table-example-result');
+  const formulaSpan = document.getElementById('table-example-formula');
+
+  if (resultSpan && formulaSpan) {
+    const cipherChar = encryptChar('H', 'K');
+    resultSpan.textContent = cipherChar;
+    formulaSpan.textContent = cipherChar;
+  }
+};
 
 /**
  * モーダル関連の機能
@@ -104,20 +174,24 @@ const initApplication = async () => {
     initTheme();
     initThemeToggle(uiElements.themeToggle());
     console.log('✅ Theme system initialized');
-    
-    // 2. メインのヴィジュネル表を生成
+
+    // 2. インデックスモードトグルの初期化
+    initIndexingModeToggle();
+    console.log('✅ Indexing mode toggle initialized');
+
+    // 3. メインのヴィジュネル表を生成
     generateMainTable(document.getElementById('vigenereTable'));
     console.log('✅ Main Vigenère table generated');
-    
-    // 3. メインタブの初期化
+
+    // 4. メインタブの初期化
     initMainTab();
     console.log('✅ Main tab initialized');
-    
-    // 4. モーダルの初期化
+
+    // 5. モーダルの初期化
     initModal();
     console.log('✅ Modal system initialized');
-    
-    // 5. 他のタブの遅延初期化
+
+    // 6. 他のタブの遅延初期化
     await initResearchTab();
     await initLabTab();
     console.log('✅ Tab observers initialized');

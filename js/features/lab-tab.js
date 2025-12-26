@@ -4,6 +4,7 @@
  */
 
 import { vigenere, sanitize, repeatKey } from '../core/cipher.js';
+import { getIndexingOffset, getCharDisplayValue } from '../core/indexing-mode.js';
 import { validateLabText, validateCaesarKey } from '../core/validation.js';
 import { generateRandomKey } from '../core/utils.js';
 import { labTabElements } from '../ui/dom-elements.js';
@@ -97,6 +98,11 @@ export const experimentCaesar = () => {
   const sanitizedText = sanitize(text);
   const { result } = vigenere(text, key, 'encrypt');
 
+  // インデックスモードに応じたシフト量を計算
+  const offset = getIndexingOffset();
+  const modeLabel = offset === 0 ? 'A=0' : 'A=1';
+  const shiftAmount = getCharDisplayValue(key);
+
   resultDiv.innerHTML = `
     <div class="result-item">
       <strong>入力:</strong> ${escapeHtml(text)}
@@ -114,8 +120,8 @@ export const experimentCaesar = () => {
       <strong>暗号文:</strong> <span class="highlight-text">${result}</span>
     </div>
     <div style="margin-top: 1rem; padding: 1rem; background-color: var(--viz-cell-bg); border-radius: var(--border-radius);">
-      <strong>📝 観察:</strong> 鍵が1文字の場合、すべての文字が同じシフト量（${key.charCodeAt(0) - 65}）で
-      暗号化されます。これはシーザー暗号と同じです！
+      <strong>📝 観察:</strong> 鍵が1文字の場合、すべての文字が同じシフト量（${shiftAmount}）で
+      暗号化されます。これはシーザー暗号と同じです！ <span style="font-size: 0.85rem; opacity: 0.7;">[${modeLabel}モード]</span>
     </div>
   `;
 };

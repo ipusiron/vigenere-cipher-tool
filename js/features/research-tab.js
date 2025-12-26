@@ -4,6 +4,7 @@
  */
 
 import { encryptChar, findKeyChar, CHAR_CODE_A } from '../core/cipher.js';
+import { getIndexingOffset, getCharDisplayValue } from '../core/indexing-mode.js';
 import { researchTabElements } from '../ui/dom-elements.js';
 import { generateResearchTable, highlightResearchCell } from '../ui/table-generator.js';
 
@@ -52,18 +53,28 @@ export const researchTabula = () => {
   }
   
   const cipherChar = encryptChar(plainChar, keyChar);
-  
+
   // 暗号文字結果を更新
   cipherResultSpan.textContent = cipherChar;
-  
+
+  // インデックスモードに応じた表示値を取得
+  const offset = getIndexingOffset();
+  const modeLabel = offset === 0 ? 'A=0' : 'A=1';
+  const plainValue = getCharDisplayValue(plainChar);
+  const keyValue = getCharDisplayValue(keyChar);
+  const plainCode = plainChar.charCodeAt(0) - CHAR_CODE_A;
+  const keyCode = keyChar.charCodeAt(0) - CHAR_CODE_A;
+  const resultValue = (plainCode + keyCode + offset) % 26;
+
   resultDiv.innerHTML = `
     <div>
       <div style="margin-bottom: 0.5rem;">
         <span>計算式: <strong style="font-family: 'Courier New', monospace; font-size: 1.1rem;">${cipherChar}←shift(${plainChar}, ${keyChar})</strong></span>
+        <span style="font-size: 0.8rem; opacity: 0.7; margin-left: 0.5rem;">[${modeLabel}モード]</span>
       </div>
       <div style="font-size: 0.9rem; color: var(--text-color); opacity: 0.8; font-family: 'Courier New', monospace;">
-        ${plainChar}(${plainChar.charCodeAt(0) - CHAR_CODE_A}) + ${keyChar}(${keyChar.charCodeAt(0) - CHAR_CODE_A}) 
-        = ${((plainChar.charCodeAt(0) - CHAR_CODE_A + keyChar.charCodeAt(0) - CHAR_CODE_A) % 26)} 
+        ${plainChar}(${plainValue}) + ${keyChar}(${keyValue})
+        = ${resultValue}
         → ${cipherChar}
       </div>
     </div>
@@ -94,18 +105,28 @@ export const researchReverseTabula = () => {
   }
   
   const keyChar = findKeyChar(plainChar, cipherChar);
-  
+
   // 鍵文字結果を更新
   keyResultSpan.textContent = keyChar;
-  
+
+  // インデックスモードに応じた表示値を取得
+  const offset = getIndexingOffset();
+  const modeLabel = offset === 0 ? 'A=0' : 'A=1';
+  const cipherValue = getCharDisplayValue(cipherChar);
+  const plainValue = getCharDisplayValue(plainChar);
+  const cipherCode = cipherChar.charCodeAt(0) - CHAR_CODE_A;
+  const plainCode = plainChar.charCodeAt(0) - CHAR_CODE_A;
+  const resultValue = (cipherCode - plainCode - offset + 26) % 26;
+
   resultDiv.innerHTML = `
     <div>
       <div style="margin-bottom: 0.5rem;">
         <span>計算式: <strong style="font-family: 'Courier New', monospace; font-size: 1.1rem;">${keyChar}←findKey(${plainChar}, ${cipherChar})</strong></span>
+        <span style="font-size: 0.8rem; opacity: 0.7; margin-left: 0.5rem;">[${modeLabel}モード]</span>
       </div>
       <div style="font-size: 0.9rem; color: var(--text-color); opacity: 0.8; font-family: 'Courier New', monospace;">
-        ${cipherChar}(${cipherChar.charCodeAt(0) - CHAR_CODE_A}) - ${plainChar}(${plainChar.charCodeAt(0) - CHAR_CODE_A}) 
-        = ${((cipherChar.charCodeAt(0) - CHAR_CODE_A - plainChar.charCodeAt(0) + CHAR_CODE_A + 26) % 26)} 
+        ${cipherChar}(${cipherValue}) - ${plainChar}(${plainValue})
+        = ${resultValue}
         → ${keyChar}
       </div>
     </div>

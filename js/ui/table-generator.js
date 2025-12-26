@@ -4,6 +4,7 @@
  */
 
 import { ALPHABET_SIZE, CHAR_CODE_A } from '../core/cipher.js';
+import { getIndexingOffset } from '../core/indexing-mode.js';
 
 /**
  * ツールチップを作成
@@ -80,9 +81,11 @@ export const generateVigenereTable = (container, tableClass = 'vig-table') => {
     tr.appendChild(th);
     
     // データセル
+    const offset = getIndexingOffset();
     for (let col = 0; col < ALPHABET_SIZE; col++) {
       const td = document.createElement('td');
-      const cipherChar = String.fromCharCode(((row + col) % ALPHABET_SIZE) + CHAR_CODE_A);
+      // A=0: (row + col) % 26, A=1: (row + col + 1) % 26
+      const cipherChar = String.fromCharCode(((row + col + offset) % ALPHABET_SIZE) + CHAR_CODE_A);
       const plainChar = String.fromCharCode(CHAR_CODE_A + col);
       const keyChar = String.fromCharCode(CHAR_CODE_A + row);
       

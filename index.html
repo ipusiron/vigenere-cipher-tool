@@ -49,25 +49,39 @@
     </div>
 
     <!-- Tab Navigation -->
-    <div class="tab-navigation">
-      <button 
-        @click="activeTab = 'cipher'" 
-        :class="{ 'active': activeTab === 'cipher' }"
-        class="tab-button">
-        暗号化・復号
-      </button>
-      <button 
-        @click="activeTab = 'tabula'" 
-        :class="{ 'active': activeTab === 'tabula' }"
-        class="tab-button">
-        タブラレクタ研究
-      </button>
-      <button 
-        @click="activeTab = 'lab'" 
-        :class="{ 'active': activeTab === 'lab' }"
-        class="tab-button">
-        実験室
-      </button>
+    <div class="tab-navigation-wrapper">
+      <div class="tab-navigation">
+        <button
+          @click="activeTab = 'cipher'"
+          :class="{ 'active': activeTab === 'cipher' }"
+          class="tab-button">
+          暗号化・復号
+        </button>
+        <button
+          @click="activeTab = 'tabula'"
+          :class="{ 'active': activeTab === 'tabula' }"
+          class="tab-button">
+          タブラレクタ研究
+        </button>
+        <button
+          @click="activeTab = 'lab'"
+          :class="{ 'active': activeTab === 'lab' }"
+          class="tab-button">
+          実験室
+        </button>
+      </div>
+      <div class="indexing-mode-container">
+        <span class="indexing-mode-prefix">表モード:</span>
+        <span id="indexing-mode-label" class="toggle-label">A=0</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="indexing-mode-toggle">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="indexing-mode-help">
+          <span class="help-icon">?</span>
+          <span class="help-tooltip">ヴィジュネル表の計算方式。A=0（標準）では A+A=A、A=1 では A+A=B となります。</span>
+        </span>
+      </div>
     </div>
 
     <!-- Tab 1: 暗号化・復号 -->
@@ -148,10 +162,10 @@
           <li><strong>左側の列（縦）</strong>：鍵文字（A〜Z）</li>
           <li><strong>交差する場所</strong>：暗号文字</li>
         </ul>
-        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
-          例：平文「H」＋鍵「K」→ 上部で「H」の列、左側で「K」の行を探し、交差する文字「R」が暗号文<br>
+        <p id="table-example-text" style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
+          例：平文「H」＋鍵「K」→ 上部で「H」の列、左側で「K」の行を探し、交差する文字「<span id="table-example-result">R</span>」が暗号文<br>
           <span style="font-family: 'Courier New', monospace; background-color: rgba(0, 0, 0, 0.1); padding: 0.2rem 0.4rem; border-radius: 3px; margin-left: 1.5rem;">
-            R←shift(H, K)
+            <span id="table-example-formula">R</span>←shift(H, K)
           </span>
         </p>
       </div>
@@ -436,6 +450,12 @@
         
         <h3>🎨 その他の機能</h3>
         <ul>
+          <li><strong>表モード切替（A=0 / A=1）</strong>: タブ横のトグルで計算方式を切り替え
+            <ul>
+              <li>A=0（標準）: A=0, B=1, ..., Z=25。A+A=A</li>
+              <li>A=1: A=1, B=2, ..., Z=26。A+A=B（一部の文献で使用）</li>
+            </ul>
+          </li>
           <li><strong>ダークモード</strong>: 🌙 アイコンでライト/ダーク切り替え</li>
           <li><strong>レスポンシブ対応</strong>: 長いテキストでも横スクロールで快適に表示</li>
           <li><strong>固定ヘッダー</strong>: スクロール時も列ラベルが常に表示</li>
@@ -443,13 +463,18 @@
         </ul>
         
         <h3>⚡ 暗号化の仕組み</h3>
-        <p>各文字は以下の数学的手順で変換されます：</p>
+        <p>各文字は以下の数学的手順で変換されます（表モードで切替可能）：</p>
         <ol>
-          <li><strong>文字コード変換</strong>: A=0, B=1, ..., Z=25</li>
+          <li><strong>文字コード変換</strong>:
+            <ul>
+              <li>A=0モード: A=0, B=1, ..., Z=25</li>
+              <li>A=1モード: A=1, B=2, ..., Z=26</li>
+            </ul>
+          </li>
           <li><strong>モジュロ26演算</strong>:
             <ul>
-              <li>暗号化: (平文 + 鍵) mod 26</li>
-              <li>復号: (暗号文 - 鍵 + 26) mod 26</li>
+              <li>A=0: 暗号化 = (平文 + 鍵) mod 26</li>
+              <li>A=1: 暗号化 = (平文 + 鍵 + 1) mod 26</li>
             </ul>
           </li>
           <li><strong>鍵の循環</strong>: 鍵は平文の長さに合わせて繰り返し使用</li>
