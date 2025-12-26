@@ -3,21 +3,13 @@
  * タブナビゲーションコンポーネント
  */
 
-/* タブナビゲーションラッパー */
-.tab-navigation-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: var(--spacing-xl);
-  gap: var(--spacing-md);
-}
-
 /* タブナビゲーション */
 .tab-navigation {
   display: flex;
   gap: var(--spacing-sm);
   border-bottom: 2px solid var(--input-border);
   padding-bottom: 0;
+  margin-bottom: var(--spacing-xl);
 }
 
 .tab-button {

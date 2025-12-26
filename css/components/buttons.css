@@ -159,7 +159,6 @@ button:disabled:hover {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding-bottom: 0.4rem;
 }
 
 .toggle-switch {
