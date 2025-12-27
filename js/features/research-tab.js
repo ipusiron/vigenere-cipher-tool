@@ -3,7 +3,7 @@
  * 研究タブ（タブラレクタ研究）の機能を担当
  */
 
-import { encryptChar, findKeyChar, CHAR_CODE_A } from '../core/cipher.js';
+import { encryptChar, findKeyChar } from '../core/cipher.js';
 import { getIndexingOffset, getCharDisplayValue } from '../core/indexing-mode.js';
 import { researchTabElements } from '../ui/dom-elements.js';
 import { generateResearchTable, highlightResearchCell } from '../ui/table-generator.js';
@@ -62,9 +62,7 @@ export const researchTabula = () => {
   const modeLabel = offset === 0 ? 'A=0' : 'A=1';
   const plainValue = getCharDisplayValue(plainChar);
   const keyValue = getCharDisplayValue(keyChar);
-  const plainCode = plainChar.charCodeAt(0) - CHAR_CODE_A;
-  const keyCode = keyChar.charCodeAt(0) - CHAR_CODE_A;
-  const resultValue = (plainCode + keyCode + offset) % 26;
+  const cipherValue = getCharDisplayValue(cipherChar);
 
   resultDiv.innerHTML = `
     <div>
@@ -74,7 +72,7 @@ export const researchTabula = () => {
       </div>
       <div style="font-size: 0.9rem; color: var(--text-color); opacity: 0.8; font-family: 'Courier New', monospace;">
         ${plainChar}(${plainValue}) + ${keyChar}(${keyValue})
-        = ${resultValue}
+        = ${cipherValue}
         → ${cipherChar}
       </div>
     </div>
@@ -114,9 +112,7 @@ export const researchReverseTabula = () => {
   const modeLabel = offset === 0 ? 'A=0' : 'A=1';
   const cipherValue = getCharDisplayValue(cipherChar);
   const plainValue = getCharDisplayValue(plainChar);
-  const cipherCode = cipherChar.charCodeAt(0) - CHAR_CODE_A;
-  const plainCode = plainChar.charCodeAt(0) - CHAR_CODE_A;
-  const resultValue = (cipherCode - plainCode - offset + 26) % 26;
+  const keyValue = getCharDisplayValue(keyChar);
 
   resultDiv.innerHTML = `
     <div>
@@ -126,7 +122,7 @@ export const researchReverseTabula = () => {
       </div>
       <div style="font-size: 0.9rem; color: var(--text-color); opacity: 0.8; font-family: 'Courier New', monospace;">
         ${cipherChar}(${cipherValue}) - ${plainChar}(${plainValue})
-        = ${resultValue}
+        = ${keyValue}
         → ${keyChar}
       </div>
     </div>
