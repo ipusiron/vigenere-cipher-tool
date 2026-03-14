@@ -119,7 +119,7 @@ export const generateVigenereTable = (container, tableClass = 'vig-table') => {
  */
 export const generateMainTable = (container) => {
   const table = generateVigenereTable(container, 'vig-table');
-  container.innerHTML = '<h3>ヴィジュネル表（タブラレクタ）</h3>';
+  container.innerHTML = '<h3>ヴィジュネル表（タブラ・レクタ）</h3>';
   container.appendChild(table);
 };
 
@@ -129,7 +129,7 @@ export const generateMainTable = (container) => {
  */
 export const generateResearchTable = (container) => {
   const table = generateVigenereTable(container, 'vig-table research-table');
-  container.innerHTML = '<h3>ヴィジュネル表（タブラレクタ）</h3>';
+  container.innerHTML = '<h3>ヴィジュネル表（タブラ・レクタ）</h3>';
   container.appendChild(table);
 };
 

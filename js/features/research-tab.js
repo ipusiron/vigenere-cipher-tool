@@ -1,6 +1,6 @@
 /**
  * Research Tab Functionality
- * 研究タブ（タブラレクタ研究）の機能を担当
+ * 研究タブ（タブラ・レクタ研究）の機能を担当
  */
 
 import { encryptChar, findKeyChar } from '../core/cipher.js';
