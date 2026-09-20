@@ -6,6 +6,7 @@
 /* メッセージコンテナベーススタイル */
 .error-message,
 .warning-message {
+  display: none;
   font-size: var(--text-sm);
   margin: 0;
   padding: 0;
@@ -14,74 +15,37 @@
 
 /* エラーメッセージ */
 .error-message {
-  color: #dc3545;
+  color: var(--message-error-text);
 }
 
 .error-message.show {
-  display: block !important;
+  display: block;
   margin-top: var(--spacing-xs);
   margin-bottom: var(--spacing-sm);
   padding: var(--spacing-sm);
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
+  background-color: var(--message-error-bg);
+  border: 1px solid var(--message-error-border);
   border-radius: var(--border-radius);
 }
 
-[data-theme="dark"] .error-message {
-  color: #ff6b6b;
-}
 
-[data-theme="dark"] .error-message.show {
-  background-color: #2c1417;
-  border-color: #842029;
-}
 
 /* 警告メッセージ */
 .warning-message {
-  color: #856404;
+  color: var(--message-warning-text);
 }
 
 .warning-message.show {
-  display: block !important;
+  display: block;
   margin-top: var(--spacing-xs);
   margin-bottom: var(--spacing-sm);
   padding: var(--spacing-sm);
-  background-color: #fff3cd;
-  border: 1px solid #ffeaa7;
+  background-color: var(--message-warning-bg);
+  border: 1px solid var(--message-warning-border);
   border-radius: var(--border-radius);
 }
 
-[data-theme="dark"] .warning-message {
-  color: #d1a827;
-}
 
-[data-theme="dark"] .warning-message.show {
-  background-color: #2d2014;
-  border-color: #664d03;
-}
-
-/* レガシー警告メッセージスタイル */
-.warning-message {
-  font-size: var(--text-sm);
-  color: #e74c3c;
-  margin-top: calc(var(--spacing-sm) * -1);
-  margin-bottom: var(--spacing-md);
-  padding: 0.3rem 0;
-  opacity: 0;
-  transform: translateY(-5px);
-  transition: all var(--transition-speed);
-  display: none;
-}
-
-.warning-message.show {
-  opacity: 1;
-  transform: translateY(0);
-  display: block;
-}
-
-[data-theme="dark"] .warning-message {
-  color: #ff6b6b;
-}
 
 /* トースト通知 */
 .copy-toast {

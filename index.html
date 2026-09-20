@@ -9,16 +9,15 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   
   <!-- Security Headers -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="no-referrer">
   
   <link rel="stylesheet" href="css/main.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="js/theme-init.js"></script>
 </head>
 <body>
-  <div class="container" x-data="{ activeTab: 'cipher' }">
+  <noscript>このツールを使うには、ブラウザーのJavaScriptを有効にしてください。</noscript>
+  <div class="container">
     <div class="header-container">
       <h1>ヴィジュネル暗号ツール<br>（Vigenere Cipher Tool）</h1>
       <div class="header-controls">
@@ -51,41 +50,29 @@
           <span class="indexing-mode-prefix">表モード:</span>
           <span id="indexing-mode-label" class="toggle-label">A=0</span>
           <label class="toggle-switch">
-            <input type="checkbox" id="indexing-mode-toggle">
+            <input type="checkbox" id="indexing-mode-toggle" aria-label="表モードをA=1に切り替える">
             <span class="toggle-slider"></span>
           </label>
           <span class="indexing-mode-help">
-            <span class="help-icon">?</span>
-            <span class="help-tooltip">ヴィジュネル表の計算方式。A=0（標準）では A+A=A、A=1 では A+A=B となります。</span>
+            <button type="button" class="help-icon" aria-describedby="indexing-help">?</button>
+            <span class="help-tooltip" id="indexing-help">ヴィジュネル表の計算方式。A=0（標準）では A+A=A、A=1 では A+A=B となります。</span>
           </span>
         </div>
       </div>
     </div>
 
     <!-- Tab Navigation -->
-    <div class="tab-navigation">
-      <button
-        @click="activeTab = 'cipher'"
-        :class="{ 'active': activeTab === 'cipher' }"
-        class="tab-button">
-        暗号化・復号
-      </button>
-      <button
-        @click="activeTab = 'tabula'"
-        :class="{ 'active': activeTab === 'tabula' }"
-        class="tab-button">
-        タブラ・レクタ研究
-      </button>
-      <button
-        @click="activeTab = 'lab'"
-        :class="{ 'active': activeTab === 'lab' }"
-        class="tab-button">
-        実験室
-      </button>
+    <div class="tab-navigation" role="tablist" aria-label="機能の切り替え">
+      <button type="button" class="tab-button active" id="tab-cipher"
+              role="tab" aria-selected="true" aria-controls="panel-cipher" tabindex="0">暗号化・復号</button>
+      <button type="button" class="tab-button" id="tab-tabula"
+              role="tab" aria-selected="false" aria-controls="panel-tabula" tabindex="-1">タブラ・レクタ研究</button>
+      <button type="button" class="tab-button" id="tab-lab"
+              role="tab" aria-selected="false" aria-controls="panel-lab" tabindex="-1">実験室</button>
     </div>
 
     <!-- Tab 1: 暗号化・復号 -->
-    <div x-show="activeTab === 'cipher'" class="tab-content">
+    <div id="panel-cipher" class="tab-content" role="tabpanel" aria-labelledby="tab-cipher">
     <label for="mode">モード選択:</label>
     <select id="mode">
       <option value="encrypt">暗号化</option>
@@ -106,7 +93,7 @@
         </button>
       </div>
       <div class="textarea-drop-zone" id="textareaDropZone">
-        <textarea id="inputText" rows="5" placeholder="ここにテキストを入力、またはファイルをドラッグ＆ドロップ" oninput="validateMainInputs()"></textarea>
+        <textarea id="inputText" rows="5" placeholder="ここにテキストを入力、またはファイルをドラッグ＆ドロップ"></textarea>
         <div class="drop-overlay" id="dropOverlay">
           <div class="drop-message">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -117,14 +104,21 @@
           </div>
         </div>
       </div>
-      <input type="file" id="fileInput" accept=".txt,.text" style="display: none;">
+      <input type="file" hidden id="fileInput" accept=".txt,.text">
     </div>
-    <div id="inputTextWarning" class="warning-message" style="display: none;"></div>
-    <div id="inputTextError" class="error-message" style="display: none;"></div>
+    <div id="inputTextWarning" aria-live="polite" class="warning-message"></div>
+    <div id="inputTextError" aria-live="polite" class="error-message"></div>
 
     <label for="key">鍵（英字）:</label>
-    <input type="text" id="key" placeholder="例: LEMON" oninput="validateMainInputs()" />
-    <div id="keyWarning" class="warning-message" style="display: none;">アルファベット以外は無視されます</div>
+    <input type="text" id="key" placeholder="例: LEMON" />
+    <div id="keyWarning" aria-live="polite" class="warning-message">アルファベット以外は無視されます</div>
+
+    <label for="outputFormat">出力形式:</label>
+    <select id="outputFormat">
+      <option value="compact">詰めて出力（英字のみ・大文字）</option>
+      <option value="group5">5文字ごとに区切る</option>
+      <option value="preserve">書式を保つ（空白・記号・大文字小文字）</option>
+    </select>
 
     <button id="processButton" disabled>実行</button>
 
@@ -141,36 +135,36 @@
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
             </svg>
           </button>
-          <div id="copyToast" class="copy-toast">コピーしました！</div>
+          <div id="copyToast" aria-live="polite" class="copy-toast">コピーしました！</div>
         </div>
       </div>
       <textarea id="outputText" rows="5" readonly></textarea>
     </div>
 
-    <div id="visualization"></div>
-    <div id="vigenereTable"></div>
+    <div id="visualization" tabindex="0" aria-label="visualization 横スクロール表示"></div>
+    <div id="vigenereTable" tabindex="0" aria-label="vigenereTable 横スクロール表示"></div>
     </div>
 
     <!-- Tab 2: タブラ・レクタ研究 -->
-    <div x-show="activeTab === 'tabula'" class="tab-content" style="display: none;">
+    <div id="panel-tabula" class="tab-content" role="tabpanel" aria-labelledby="tab-tabula" hidden>
       <p>ヴィジュネル表（タブラ・レクタ）を使って、文字の換字変換を研究します。</p>
       
-      <div style="margin: 1rem 0; padding: 1rem; background-color: var(--viz-cell-bg); border-radius: var(--border-radius); border: 1px solid var(--input-border);">
+      <div class="table-guide">
         <strong>📖 表の見方：</strong>
-        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+        <ul class="table-guide-list">
           <li><strong>上部の行（横）</strong>：平文文字（A〜Z）</li>
           <li><strong>左側の列（縦）</strong>：鍵文字（A〜Z）</li>
           <li><strong>交差する場所</strong>：暗号文字</li>
         </ul>
-        <p id="table-example-text" style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
+        <p id="table-example-text">
           例：平文「H」＋鍵「K」→ 上部で「H」の列、左側で「K」の行を探し、交差する文字「<span id="table-example-result">R</span>」が暗号文<br>
-          <span style="font-family: 'Courier New', monospace; background-color: rgba(0, 0, 0, 0.1); padding: 0.2rem 0.4rem; border-radius: 3px; margin-left: 1.5rem;">
+          <span class="example-formula">
             <span id="table-example-formula">R</span>←shift(H, K)
           </span>
         </p>
       </div>
       
-      <div id="researchTable"></div>
+      <div id="researchTable" tabindex="0" aria-label="researchTable 横スクロール表示"></div>
       
       <h3>平文文字と鍵文字から、暗号文文字を計算する</h3>
       
@@ -178,7 +172,7 @@
         <div class="research-controls">
           <label for="plainChar">
             平文文字:
-            <select id="plainChar" x-model="plainChar">
+            <select id="plainChar">
             <option value="">選択</option>
             <option value="A">A</option>
             <option value="B">B</option>
@@ -211,7 +205,7 @@
           
           <label for="keyChar">
             鍵文字:
-            <select id="keyChar" x-model="keyChar">
+            <select id="keyChar">
             <option value="">選択</option>
             <option value="A">A</option>
             <option value="B">B</option>
@@ -242,15 +236,15 @@
             </select>
           </label>
           
-          <button onclick="researchTabula()">計算</button>
+          <button id="researchButton">計算</button>
           
-          <div id="researchCipherResult" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+          <div id="researchCipherResult">
             <span>暗号文文字:</span>
-            <span id="cipherCharResult" style="font-weight: bold; font-size: 1.2rem; color: var(--button-bg);">―</span>
+            <span id="cipherCharResult">―</span>
           </div>
         </div>
         
-        <div id="researchResult" class="research-result"></div>
+        <div id="researchResult" aria-live="polite" class="research-result"></div>
       </div>
       
       <h3>平文文字と暗号文文字から、鍵文字を計算する</h3>
@@ -259,7 +253,7 @@
         <div class="research-controls">
           <label for="plainCharReverse">
             平文文字:
-            <select id="plainCharReverse" x-model="plainCharReverse">
+            <select id="plainCharReverse">
             <option value="">選択</option>
             <option value="A">A</option>
             <option value="B">B</option>
@@ -292,7 +286,7 @@
           
           <label for="cipherCharReverse">
             暗号文文字:
-            <select id="cipherCharReverse" x-model="cipherCharReverse">
+            <select id="cipherCharReverse">
             <option value="">選択</option>
             <option value="A">A</option>
             <option value="B">B</option>
@@ -323,36 +317,34 @@
             </select>
           </label>
           
-          <button onclick="researchReverseTabula()">計算</button>
+          <button id="researchReverseButton">計算</button>
           
-          <div id="researchReverseKeyResult" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+          <div id="researchReverseKeyResult">
             <span>鍵文字:</span>
-            <span id="keyCharReverseResult" style="font-weight: bold; font-size: 1.2rem; color: var(--button-bg);">―</span>
+            <span id="keyCharReverseResult">―</span>
           </div>
         </div>
         
-        <div id="researchReverseResult" class="research-result"></div>
+        <div id="researchReverseResult" aria-live="polite" class="research-result"></div>
       </div>
     </div>
 
     <!-- Tab 3: ヴィジュネル暗号実験室 -->
-    <div x-show="activeTab === 'lab'" class="tab-content" style="display: none;">
+    <div id="panel-lab" class="tab-content" role="tabpanel" aria-labelledby="tab-lab" hidden>
       <div class="experiment-section">
         <h3>実験1: シーザー暗号との関係</h3>
         <p>鍵が1文字の場合、ヴィジュネル暗号はシーザー暗号と同じになります。</p>
         
         <div class="experiment-controls">
           <label for="caesarText">平文:</label>
-          <input type="text" id="caesarText" placeholder="HELLO WORLD" 
-                 oninput="validateCaesarInputs()">
-          <div id="caesarTextError" class="error-message" style="display: none;"></div>
+          <input type="text" id="caesarText" placeholder="HELLO WORLD">
+          <div id="caesarTextError" aria-live="polite" class="error-message"></div>
           
           <label for="caesarKey">鍵（1文字）:</label>
-          <input type="text" id="caesarKey" maxlength="1" placeholder="K" 
-                 oninput="validateCaesarInputs()">
-          <div id="caesarKeyError" class="error-message" style="display: none;"></div>
+          <input type="text" id="caesarKey" maxlength="1" placeholder="K">
+          <div id="caesarKeyError" aria-live="polite" class="error-message"></div>
           
-          <button id="caesarButton" onclick="experimentCaesar()">実験する</button>
+          <button id="caesarButton">実験する</button>
         </div>
         
         <div id="caesarResult" class="experiment-result"></div>
@@ -360,21 +352,20 @@
       
       <div class="experiment-section">
         <h3>実験2: ワンタイムパッドとの関係</h3>
-        <p>鍵の長さが平文と同じでランダムな場合、理論上解読不可能な暗号（ワンタイムパッド）になります。</p>
+        <p>平文の英字数と同じ長さの鍵を生成し、ワンタイムパッドの原理を実験します。鍵の配送・破棄までは再現しません。</p>
         
         <div class="experiment-controls">
           <label for="otpText">平文:</label>
-          <input type="text" id="otpText" placeholder="SECRET" 
-                 oninput="validateOTPInputs()">
-          <div id="otpTextError" class="error-message" style="display: none;"></div>
+          <input type="text" id="otpText" placeholder="SECRET">
+          <div id="otpTextError" aria-live="polite" class="error-message"></div>
           
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div class="otp-key-controls">
             <label for="otpKey">鍵（平文と同じ長さ）:</label>
-            <button id="generateKeyButton" onclick="generateRandomKey()">ランダム鍵生成</button>
+            <button id="generateKeyButton">ランダム鍵生成</button>
           </div>
           <input type="text" id="otpKey" placeholder="自動生成されます" readonly>
           
-          <button id="otpButton" onclick="experimentOTP()">実験する</button>
+          <button id="otpButton">実験する</button>
         </div>
         
         <div id="otpResult" class="experiment-result"></div>
@@ -384,15 +375,15 @@
 
     <footer class="app-footer">
       <div class="footer">
-        🔗 GitHubリポジトリはこちら（<a href="https://github.com/ipusiron/vigenere-cipher-tool" target="_blank"> ipusiron/vigenere-cipher-tool </a>）
+        🔗 GitHubリポジトリーはこちら（<a href="https://github.com/ipusiron/vigenere-cipher-tool" target="_blank" rel="noopener noreferrer"> ipusiron/vigenere-cipher-tool </a>）
       </div>
     </footer>
 
   <!-- Help Modal -->
-  <div id="help-modal" class="modal">
+  <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🔐 ヴィジュネル暗号ツール - 完全ガイド</h2>
+        <h2 id="help-modal-title">🔐 ヴィジュネル暗号ツール - 完全ガイド</h2>
         <button class="modal-close" aria-label="閉じる">&times;</button>
       </div>
       <div class="modal-body">
@@ -407,10 +398,11 @@
             <ul>
               <li>📁 ファイル選択アイコンでテキストファイル読み込み</li>
               <li>ドラッグ&ドロップでファイル読み込み対応</li>
-              <li>英字以外は自動的に除外されます</li>
+              <li>全角英字はエラーになります。その他の英字以外は無視し、「書式を保つ」ではそのまま出力します</li>
             </ul>
           </li>
           <li><strong>鍵の入力</strong>: 暗号化・復号に使用する鍵を英字で入力（例: LEMON）</li>
+          <li><strong>出力形式</strong>: 詰めて出力／5文字ごとに区切る／書式を保つ、の3形式を選択</li>
           <li><strong>実行</strong>: 「実行」ボタンをクリックして結果を表示</li>
           <li><strong>結果コピー</strong>: 📋 コピーアイコンでワンクリックコピー</li>
         </ol>
@@ -444,7 +436,7 @@
         <strong>ワンタイムパッド実験:</strong>
         <ul>
           <li>平文と同じ長さのランダム鍵を自動生成</li>
-          <li>理論上解読不可能な暗号化を体験</li>
+          <li>crypto.getRandomValuesと棄却サンプリングによる鍵を使用</li>
           <li>文字ごとの対応関係を詳細に可視化</li>
         </ul>
         
@@ -474,7 +466,7 @@
           <li><strong>モジュロ26演算</strong>:
             <ul>
               <li>A=0: 暗号化 = (平文 + 鍵) mod 26</li>
-              <li>A=1: 暗号化 = (平文 + 鍵 + 1) mod 26</li>
+              <li>A=1: 暗号化 = (平文 + 鍵) mod 26（0は26と読む）</li>
             </ul>
           </li>
           <li><strong>鍵の循環</strong>: 鍵は平文の長さに合わせて繰り返し使用</li>

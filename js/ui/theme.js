@@ -3,6 +3,14 @@
  * テーマ切り替えの責任を担当
  */
 
+let savedTheme = null;
+try {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light' || saved === 'dark') savedTheme = saved;
+} catch {
+  // Storageが使えない環境でも配色を切り替えられる。
+}
+
 /**
  * 現在のテーマを取得
  * @returns {string} 'light' または 'dark'
@@ -22,7 +30,12 @@ export const setTheme = (theme) => {
   }
   
   document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('theme', theme);
+  savedTheme = theme;
+  try {
+    localStorage.setItem('theme', theme);
+  } catch {
+    // このページ内では保存済みの変数を使う。
+  }
 };
 
 /**
@@ -40,8 +53,7 @@ export const toggleTheme = () => {
  * 保存されたテーマを読み込み
  */
 export const loadSavedTheme = () => {
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  setTheme(savedTheme);
+  setTheme(savedTheme || 'light');
 };
 
 /**
@@ -55,8 +67,7 @@ export const initThemeToggle = (toggleButton) => {
   }
   
   toggleButton.addEventListener('click', () => {
-    const newTheme = toggleTheme();
-    console.log(`Theme switched to: ${newTheme}`);
+    toggleTheme();
   });
 };
 
@@ -71,27 +82,6 @@ export const detectSystemTheme = () => {
   return 'light';
 };
 
-/**
- * システムテーマの変更を監視
- * @param {Function} callback - テーマ変更時のコールバック関数
- */
-export const watchSystemTheme = (callback) => {
-  if (!window.matchMedia) return;
-  
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  
-  const handleChange = (e) => {
-    const systemTheme = e.matches ? 'dark' : 'light';
-    if (callback) {
-      callback(systemTheme);
-    }
-  };
-  
-  mediaQuery.addEventListener('change', handleChange);
-  
-  // 初回実行
-  handleChange(mediaQuery);
-};
 
 /**
  * テーマに基づいてクラスを追加/削除
@@ -118,7 +108,7 @@ export const applyThemeClass = (element, lightClass, darkClass) => {
  * @param {boolean} useSystemTheme - システムテーマを使用するかどうか
  */
 export const initTheme = (useSystemTheme = false) => {
-  if (useSystemTheme && !localStorage.getItem('theme')) {
+  if (useSystemTheme && !savedTheme) {
     const systemTheme = detectSystemTheme();
     setTheme(systemTheme);
   } else {
@@ -133,7 +123,7 @@ export const initTheme = (useSystemTheme = false) => {
 export const getThemeInfo = () => {
   return {
     current: getCurrentTheme(),
-    saved: localStorage.getItem('theme'),
+    saved: savedTheme,
     system: detectSystemTheme(),
     available: ['light', 'dark']
   };

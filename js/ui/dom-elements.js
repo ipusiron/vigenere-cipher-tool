@@ -10,6 +10,7 @@ export const mainTabElements = {
   mode: () => document.getElementById('mode'),
   inputText: () => document.getElementById('inputText'),
   key: () => document.getElementById('key'),
+  outputFormat: () => document.getElementById('outputFormat'),
   sanitizedText: () => document.getElementById('sanitizedText'),
   outputText: () => document.getElementById('outputText'),
   processButton: () => document.getElementById('processButton'),

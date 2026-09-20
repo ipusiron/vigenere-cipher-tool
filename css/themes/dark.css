@@ -12,10 +12,15 @@
   /* Interactive elements */
   --input-bg: #222222;
   --input-border: #555555;
-  --button-bg: #007acc;
+  --button-bg: #0074c2;
   --button-text: #ffffff;
-  --link-color: #00aaff;
+  --link-color: #4db8ff;
   
+  --accent-text: #4db8ff;
+  --footer-text: #c8c8c8;
+  --placeholder-text: #a0a0a0;
+  --field-border: #808080;
+
   /* Visualization elements */
   --viz-header-bg: #444444;
   --viz-cell-bg: #333333;
@@ -32,6 +37,6 @@
   --message-error-border: #842029;
   
   /* Tooltip colors */
-  --tooltip-bg: rgba(255, 255, 255, 0.95);
+  --tooltip-bg: #f4f4f4;
   --tooltip-text: #121212;
 }

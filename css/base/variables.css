@@ -4,22 +4,6 @@
  */
 
 :root {
-  /* === Color System === */
-  
-  /* Light theme colors */
-  --bg-color: #f0f0f0;
-  --text-color: #333;
-  --container-bg: #fff;
-  --input-bg: #fff;
-  --input-border: #ccc;
-  --button-bg: #007bff;
-  --button-text: #fff;
-  --link-color: #007bff;
-  --viz-header-bg: #e9ecef;
-  --viz-cell-bg: #f8f9fa;
-  --table-border: #dee2e6;
-  --table-header-bg: #f2f2f2;
-  
   /* === Layout System === */
   
   /* Spacing */
@@ -128,40 +112,4 @@
   --container-lg: 1024px;
   --container-xl: 1280px;
   --container-max: 800px; /* Current app max-width */
-}
-
-/**
- * Semantic Color Variables
- * 意味的な色の定義（状態やコンテキスト）
- */
-:root {
-  /* State colors */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
-  
-  /* Success variants */
-  --success-50: #ecfdf5;
-  --success-100: #d1fae5;
-  --success-500: var(--color-success);
-  --success-900: #064e3b;
-  
-  /* Warning variants */
-  --warning-50: #fffbeb;
-  --warning-100: #fef3c7;
-  --warning-500: var(--color-warning);
-  --warning-900: #78350f;
-  
-  /* Error variants */
-  --error-50: #fef2f2;
-  --error-100: #fee2e2;
-  --error-500: var(--color-error);
-  --error-900: #7f1d1d;
-  
-  /* Info variants */
-  --info-50: #eff6ff;
-  --info-100: #dbeafe;
-  --info-500: var(--color-info);
-  --info-900: #1e3a8a;
 }

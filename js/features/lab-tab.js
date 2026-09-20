@@ -6,31 +6,31 @@
 import { vigenere, sanitize, repeatKey } from '../core/cipher.js';
 import { getIndexingOffset, getCharDisplayValue } from '../core/indexing-mode.js';
 import { validateLabText, validateCaesarKey } from '../core/validation.js';
-import { generateRandomKey } from '../core/utils.js';
+import { generateRandomKey } from '../core/random.js';
 import { labTabElements } from '../ui/dom-elements.js';
-import { displayValidationMessage } from '../ui/message-display.js';
+import { displayVisualization } from '../ui/table-generator.js';
+import { displayValidationMessage, showError } from '../ui/message-display.js';
 
 /**
  * 実験室タブの初期化フラグ
  */
 let isInitialized = false;
 
-/**
- * HTMLエスケープ（XSS対策）
- * @param {string} str - エスケープする文字列
- * @returns {string} エスケープされた文字列
- */
-const escapeHtml = (str) => {
-  const htmlEscapeMap = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    '/': '&#x2F;'
-  };
-  return str.replace(/[&<>"'/]/g, (match) => htmlEscapeMap[match]);
+/** 結果の1行を入力のHTML解釈なしで追加する。 */
+const appendResult = (container, label, value, highlight = false) => {
+  const item = document.createElement('div');
+  item.className = 'result-item';
+  const title = document.createElement('strong');
+  title.textContent = label + ': ';
+  const content = document.createElement('span');
+  content.textContent = value;
+  if (highlight) content.className = 'highlight-text';
+  item.append(title, content);
+  container.appendChild(item);
 };
+let caesarHasResult = false;
+let otpHasResult = false;
+let otpNeedsKey = false;
 
 /**
  * シーザー暗号入力の検証
@@ -57,7 +57,7 @@ export const validateCaesarInputs = () => {
   // ボタンの有効性を更新
   const hasValidText = sanitize(textInput.value).length > 0;
   const hasValidKey = /^[A-Z]$/.test(sanitizedKey);
-  button.disabled = !(hasValidText && hasValidKey);
+  button.disabled = !(hasValidText && hasValidKey && textValidation.isValid);
 };
 
 /**
@@ -76,10 +76,17 @@ export const validateOTPInputs = () => {
   
   // ボタンの有効性を更新
   const hasValidText = sanitize(textInput.value).length > 0;
-  const hasKey = keyInput.value.trim().length > 0;
+  const hasKey = keyInput.value.length === sanitize(textInput.value).length && keyInput.value.length > 0;
+  if (keyInput.value && !hasKey) {
+    keyInput.value = '';
+    otpNeedsKey = true;
+    otpHasResult = false;
+    labTabElements.otpResult().replaceChildren();
+  }
+  if (otpNeedsKey) showError(textError, '平文が変わりました。鍵を生成し直してください');
   
-  generateKeyButton.disabled = !hasValidText;
-  button.disabled = !(hasValidText && hasKey);
+  generateKeyButton.disabled = !(hasValidText && textValidation.isValid);
+  button.disabled = !(hasValidText && hasKey && textValidation.isValid);
 };
 
 /**
@@ -90,40 +97,26 @@ export const experimentCaesar = () => {
   const key = labTabElements.caesarKey().value;
   const resultDiv = labTabElements.caesarResult();
   
-  if (!text || !key) {
-    resultDiv.innerHTML = '<span style="color: var(--text-color)">平文と鍵を入力してください</span>';
-    return;
-  }
+  validateCaesarInputs();
+  if (labTabElements.caesarButton().disabled) return;
   
   const sanitizedText = sanitize(text);
-  const { result } = vigenere(text, key, 'encrypt');
+  const { result } = vigenere(text, key, 'encrypt', getIndexingOffset());
 
   // インデックスモードに応じたシフト量を計算
   const offset = getIndexingOffset();
   const modeLabel = offset === 0 ? 'A=0' : 'A=1';
   const shiftAmount = getCharDisplayValue(key);
 
-  resultDiv.innerHTML = `
-    <div class="result-item">
-      <strong>入力:</strong> ${escapeHtml(text)}
-    </div>
-    <div class="result-item">
-      <strong>処理対象（英字のみ）:</strong> ${sanitizedText}
-    </div>
-    <div class="result-item">
-      <strong>鍵（1文字）:</strong> ${key}
-    </div>
-    <div class="result-item">
-      <strong>繰り返された鍵:</strong> ${repeatKey(key, sanitizedText.length)}
-    </div>
-    <div class="result-item">
-      <strong>暗号文:</strong> <span class="highlight-text">${result}</span>
-    </div>
-    <div style="margin-top: 1rem; padding: 1rem; background-color: var(--viz-cell-bg); border-radius: var(--border-radius);">
-      <strong>📝 観察:</strong> 鍵が1文字の場合、すべての文字が同じシフト量（${shiftAmount}）で
-      暗号化されます。これはシーザー暗号と同じです！ <span style="font-size: 0.85rem; opacity: 0.7;">[${modeLabel}モード]</span>
-    </div>
-  `;
+  resultDiv.replaceChildren();
+  appendResult(resultDiv, '入力', text);
+  appendResult(resultDiv, '処理対象（英字のみ）', sanitizedText);
+  appendResult(resultDiv, '鍵（1文字）', key);
+  appendResult(resultDiv, '繰り返された鍵', repeatKey(key, sanitizedText.length));
+  appendResult(resultDiv, '暗号文', result, true);
+  appendResult(resultDiv, 'シフト量', String(shiftAmount));
+  appendResult(resultDiv, '観察', `すべての文字を同じ量だけずらすシーザー暗号です（${modeLabel}）。`);
+  caesarHasResult = true;
 };
 
 /**
@@ -134,10 +127,14 @@ export const generateRandomKeyForOTP = () => {
   const sanitizedText = sanitize(otpText);
   
   if (!sanitizedText) {
-    alert('まず平文を入力してください');
+    showError(labTabElements.otpTextError(), 'まず平文を入力してください');
     return;
   }
   
+  if (!validateLabText(otpText).isValid) return;
+  otpNeedsKey = false;
+  otpHasResult = false;
+  labTabElements.otpResult().replaceChildren();
   const randomKey = generateRandomKey(sanitizedText.length);
   labTabElements.otpKey().value = randomKey;
   
@@ -153,58 +150,29 @@ export const experimentOTP = () => {
   const key = labTabElements.otpKey().value;
   const resultDiv = labTabElements.otpResult();
   
-  if (!text || !key) {
-    resultDiv.innerHTML = '<span style="color: var(--text-color)">平文を入力し、ランダム鍵を生成してください</span>';
-    return;
-  }
+  validateOTPInputs();
+  if (labTabElements.otpButton().disabled || key.length !== sanitize(text).length) return;
   
   const sanitizedText = sanitize(text);
-  const { result, visualization } = vigenere(text, key, 'encrypt');
-  
-  // 可視化テーブルを作成
-  let vizTable = '<table style="margin: 1rem 0; border-collapse: collapse;">';
-  vizTable += '<tr><th style="padding: 0.5rem; border: 1px solid var(--input-border);">平文</th>';
-  visualization.forEach(v => {
-    vizTable += `<td style="padding: 0.5rem; border: 1px solid var(--input-border); text-align: center;">${v.plain}</td>`;
-  });
-  vizTable += '</tr><tr><th style="padding: 0.5rem; border: 1px solid var(--input-border);">鍵</th>';
-  visualization.forEach(v => {
-    vizTable += `<td style="padding: 0.5rem; border: 1px solid var(--input-border); text-align: center;">${v.key}</td>`;
-  });
-  vizTable += '</tr><tr><th style="padding: 0.5rem; border: 1px solid var(--input-border);">暗号文</th>';
-  visualization.forEach(v => {
-    vizTable += `<td style="padding: 0.5rem; border: 1px solid var(--input-border); text-align: center; font-weight: bold; color: var(--button-bg);">${v.result}</td>`;
-  });
-  vizTable += '</tr></table>';
-  
-  resultDiv.innerHTML = `
-    <div class="result-item">
-      <strong>平文:</strong> ${sanitizedText}
-    </div>
-    <div class="result-item">
-      <strong>ランダム鍵:</strong> ${key}
-    </div>
-    <div class="result-item">
-      <strong>暗号文:</strong> <span class="highlight-text">${result}</span>
-    </div>
-    ${vizTable}
-    <div style="margin-top: 1rem; padding: 1rem; background-color: var(--viz-cell-bg); border-radius: var(--border-radius);">
-      <strong>🔐 重要な観察:</strong>
-      <ul style="margin: 0.5rem 0;">
-        <li>鍵の長さが平文と同じ（${sanitizedText.length}文字）</li>
-        <li>鍵がランダムで一度だけ使用される</li>
-        <li>この条件下では、理論上解読不可能（情報理論的安全性）</li>
-        <li>これがワンタイムパッド暗号の原理です！</li>
-      </ul>
-    </div>
-  `;
+  const { result, visualization } = vigenere(text, key, 'encrypt', getIndexingOffset());
+
+  resultDiv.replaceChildren();
+  appendResult(resultDiv, '平文', sanitizedText);
+  appendResult(resultDiv, 'ランダム鍵', key);
+  appendResult(resultDiv, '暗号文', result, true);
+  const visualizationContainer = document.createElement('div');
+  visualizationContainer.className = 'lab-visualization';
+  displayVisualization(visualizationContainer, visualization);
+  resultDiv.appendChild(visualizationContainer);
+  appendResult(resultDiv, '観察', `鍵の長さが平文と同じ（${key.length}文字）`);
+  appendResult(resultDiv, '注意', 'ブラウザーの乱数による実験です。鍵の配送・破棄までは再現しません。');
+  otpHasResult = true;
 };
 
 /**
  * 実験室タブのイベントリスナーを初期化
  */
 export const initLabTabEventListeners = () => {
-  console.log('🧪 Initializing lab tab event listeners...');
   
   // シーザー暗号実験
   const caesarText = labTabElements.caesarText();
@@ -229,58 +197,25 @@ export const initLabTabEventListeners = () => {
     validateCaesarInputs();
     validateOTPInputs();
     
-    console.log('✅ Lab tab input event listeners added');
   } else {
     console.error('❌ Lab tab input elements not found!');
-    console.log('- caesarText:', caesarText);
-    console.log('- caesarKey:', caesarKey);
-    console.log('- otpText:', otpText);
   }
   
-  // グローバル関数として残す（HTMLのonclick属性用）
-  window.experimentCaesar = experimentCaesar;
-  window.generateRandomKey = generateRandomKeyForOTP;
-  window.experimentOTP = experimentOTP;
-  window.validateCaesarInputs = validateCaesarInputs;
-  window.validateOTPInputs = validateOTPInputs;
-  
-  // デバッグ用のグローバル関数
-  window.debugLabTab = () => {
-    console.log('🐛 Debug lab tab:');
-    console.log('- isInitialized:', isInitialized);
-    console.log('- caesarText element:', labTabElements.caesarText());
-    console.log('- caesarKey element:', labTabElements.caesarKey());
-    console.log('- caesarButton element:', labTabElements.caesarButton());
-    console.log('- otpText element:', labTabElements.otpText());
-    console.log('- otpButton element:', labTabElements.otpButton());
-  };
-  
-  window.forceValidateLabInputs = () => {
-    console.log('🔧 Force validating lab inputs...');
-    validateCaesarInputs();
-    validateOTPInputs();
-  };
+  caesarButton.addEventListener('click', experimentCaesar);
+  otpButton.addEventListener('click', experimentOTP);
+  generateKeyButton.addEventListener('click', generateRandomKeyForOTP);
+};
+
+export const refreshLabResults = () => {
+  if (caesarHasResult) experimentCaesar();
+  if (otpHasResult) experimentOTP();
 };
 
 /**
  * 実験室タブを初期化
  */
 export const initLabTab = () => {
-  console.log('🧪 Initializing Lab Tab... (isInitialized:', isInitialized, ')');
-  
-  // 強制的に再初期化を許可（ボタン無効化問題のため）
-  
-  // イベントリスナーを初期化（遅延実行で確実に）
-  setTimeout(() => {
-    initLabTabEventListeners();
-  }, 100);
-  
-  // 追加の遅延初期化（Alpine.js完全読み込み待ち）
-  setTimeout(() => {
-    console.log('🧪 Secondary initialization attempt...');
-    initLabTabEventListeners();
-  }, 1200);
-  
+  if (isInitialized) return;
+  initLabTabEventListeners();
   isInitialized = true;
-  console.log('✅ Lab Tab initialized');
 };

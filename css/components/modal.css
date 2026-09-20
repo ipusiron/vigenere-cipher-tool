@@ -54,12 +54,12 @@
   font-size: var(--text-2xl);
   cursor: pointer;
   color: var(--text-color);
-  width: auto;
-  height: auto;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0;
   line-height: 1;
   margin: 0;
-  opacity: 0.7;
+  opacity: 1;
   transition: opacity var(--transition-speed);
 }
 
@@ -94,7 +94,7 @@
 }
 
 .modal-body strong {
-  color: var(--button-bg);
+  color: var(--accent-text);
 }
 
 /* モーダルアニメーション */
