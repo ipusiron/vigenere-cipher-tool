@@ -62,7 +62,7 @@ h1 {
   margin-top: var(--spacing-xl);
   text-align: center;
   font-size: var(--text-sm);
-  opacity: 0.8;
+  color: var(--footer-text);
 }
 
 /* レスポンシブレイアウト */
@@ -72,14 +72,39 @@ h1 {
   }
   
   .container {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
   }
   
   h1 {
-    font-size: var(--text-lg);
+    font-size: 1rem;
+    flex: none;
+    width: 100%;
   }
   
   .header-container {
+    flex-direction: column;
     justify-content: center;
   }
+}
+[hidden] {
+  display: none !important;
+}
+
+a {
+  color: var(--link-color);
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 0.5rem;
+  }
+
+  .header-controls {
+    align-items: center;
+  }
+
 }

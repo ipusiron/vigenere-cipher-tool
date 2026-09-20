@@ -3,12 +3,39 @@
  * メインタブ（暗号化・復号）の機能を担当
  */
 
-import { vigenere, sanitize } from '../core/cipher.js';
-import { validateInputText, validateKey } from '../core/validation.js';
-import { getUrlParameter, sanitizeUrlText, readFileAsText } from '../core/utils.js';
+import { vigenere, sanitize, formatOutput } from '../core/cipher.js';
+import { validateInputText, validateFile } from '../core/validation.js';
+import { readFileAsText } from '../core/utils.js';
+import { normalizeLoadedText, readTextParam, MAX_TEXT_LENGTH } from '../core/input.js';
+import { getIndexingOffset } from '../core/indexing-mode.js';
 import { mainTabElements } from '../ui/dom-elements.js';
-import { displayValidationMessage, showToast } from '../ui/message-display.js';
+import { displayValidationMessage, showToast, showWarning, showError } from '../ui/message-display.js';
 import { displayVisualization, highlightTableCell, clearTableHighlight } from '../ui/table-generator.js';
+
+let hasResult = false;
+let loadWarning = '';
+
+export const clearMainResult = () => {
+  hasResult = false;
+  mainTabElements.sanitizedText().value = '';
+  mainTabElements.outputText().value = '';
+  mainTabElements.visualization().replaceChildren();
+  clearTableHighlight();
+};
+
+const applyLoadedText = (raw) => {
+  const loaded = normalizeLoadedText(raw);
+  mainTabElements.inputText().value = loaded.text;
+  loadWarning = loaded.truncated
+    ? `先頭${MAX_TEXT_LENGTH.toLocaleString('en-US')}文字だけを読み込みました（元は${loaded.originalLength.toLocaleString('en-US')}文字）`
+    : '';
+  clearMainResult();
+  validateMainInputs();
+};
+
+export const refreshMainResult = () => {
+  if (hasResult) processText();
+};
 
 /**
  * メインタブの入力を検証してUI更新
@@ -21,7 +48,7 @@ export const validateMainInputs = () => {
   const inputTextError = mainTabElements.inputTextError();
   
   // 入力テキストの検証
-  const inputValidation = validateInputText(inputText);
+  const inputValidation = validateInputText(inputText, mainTabElements.outputFormat().value);
   displayValidationMessage(inputTextWarning, inputTextError, inputValidation);
   
   // 両フィールドが有効な出力を生成できるかチェック
@@ -32,7 +59,11 @@ export const validateMainInputs = () => {
   const hasValidKey = sanitizedKey.length > 0;
   
   // ボタンの有効/無効を制御
-  processButton.disabled = !(hasValidText && hasValidKey && inputValidation.isValid);
+  const canProcess = hasValidText && hasValidKey && inputValidation.isValid;
+  processButton.disabled = !canProcess;
+  if (!canProcess) clearMainResult();
+  if (loadWarning) showWarning(inputTextWarning, loadWarning);
+  return canProcess;
 };
 
 /**
@@ -70,43 +101,21 @@ export const handleKeyInput = (event) => {
  * テキスト処理（暗号化・復号の実行）
  */
 export const processText = () => {
+  if (!validateMainInputs()) return;
+  if (mainTabElements.inputText().value.length > MAX_TEXT_LENGTH) {
+    applyLoadedText(mainTabElements.inputText().value);
+    if (!validateMainInputs()) return;
+  }
   const mode = mainTabElements.mode().value;
   const key = mainTabElements.key().value;
   const inputText = mainTabElements.inputText().value;
-  
-  if (!inputText.trim()) {
-    alert('テキストを入力してください。');
-    return;
-  }
-  
-  if (!key.trim()) {
-    alert('鍵を入力してください。');
-    return;
-  }
-  
-  // サニタイズされたテキストを表示
-  const sanitizedInput = sanitize(inputText);
-  mainTabElements.sanitizedText().value = sanitizedInput;
-  
-  if (!sanitizedInput) {
-    alert('英字を含むテキストを入力してください。');
-    return;
-  }
-  
-  // 暗号化・復号の実行
-  const { result, visualization } = vigenere(inputText, key, mode);
-  mainTabElements.outputText().value = result;
-  
-  // 可視化テーブルを表示（モードを渡す）
-  const visualizationContainer = mainTabElements.visualization();
-  const table = displayVisualization(visualizationContainer, visualization, mode);
-  
-  // ホバーイベントリスナーを追加
-  const cells = table.querySelectorAll('.viz-cell');
-  cells.forEach(cell => {
-    cell.addEventListener('mouseenter', handleCellHover);
-    cell.addEventListener('mouseleave', handleCellLeave);
-  });
+  const offset = getIndexingOffset();
+  const format = mainTabElements.outputFormat().value;
+  mainTabElements.sanitizedText().value = sanitize(inputText);
+  const { visualization } = vigenere(inputText, key, mode, offset);
+  mainTabElements.outputText().value = formatOutput(inputText, key, mode, offset, format);
+  displayVisualization(mainTabElements.visualization(), visualization, mode);
+  hasResult = true;
 };
 
 /**
@@ -114,7 +123,8 @@ export const processText = () => {
  * @param {Event} event - マウスイベント
  */
 export const handleCellHover = (event) => {
-  const cell = event.target;
+  const cell = event.target.closest('.viz-cell');
+  if (!cell) return;
   const plain = cell.dataset.plain;
   const key = cell.dataset.key;
   highlightTableCell(plain, key);
@@ -144,7 +154,7 @@ export const copyToClipboard = async () => {
     // フォールバック（古いブラウザ対応）
     const textArea = mainTabElements.outputText();
     textArea.select();
-    textArea.setSelectionRange(0, 99999);
+    textArea.setSelectionRange(0, outputText.length);
     
     try {
       document.execCommand('copy');
@@ -159,30 +169,17 @@ export const copyToClipboard = async () => {
  * URLパラメータからテキストを読み込み
  */
 export const loadTextFromUrl = () => {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has('text')) return;
   try {
-    const encodedText = getUrlParameter('text');
-    if (!encodedText) return;
-    
-    // URL デコードとサニタイズ
-    const decodedText = decodeURIComponent(encodedText);
-    const sanitizedText = sanitizeUrlText(decodedText);
-    
-    if (sanitizedText) {
-      // 入力フィールドに設定
-      mainTabElements.inputText().value = sanitizedText;
-      
-      // 検証を実行
-      validateMainInputs();
-      
-      // URLパラメータをクリア（オプション）
-      const url = new URL(window.location);
-      url.searchParams.delete('text');
-      window.history.replaceState({}, document.title, url.pathname + url.search);
-      
-      console.log('Text loaded from URL parameter');
-    }
-  } catch (error) {
-    console.error('Failed to load URL parameter');
+    const raw = url.searchParams.get('text');
+    applyLoadedText(raw);
+    mainTabElements.inputText().value = readTextParam(url.search);
+  } catch {
+    showError(mainTabElements.inputTextError(), 'URLのテキストを読み込めませんでした');
+  } finally {
+    url.searchParams.delete('text');
+    window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
   }
 };
 
@@ -212,7 +209,6 @@ export const handleFileChange = (event) => {
  */
 export const handleFileLoad = async (file) => {
   try {
-    const { validateFile } = await import('../core/validation.js');
     const validation = validateFile(file);
     
     if (!validation.isValid) {
@@ -222,15 +218,12 @@ export const handleFileLoad = async (file) => {
     const content = await readFileAsText(file);
     
     if (content.trim()) {
-      mainTabElements.inputText().value = content;
-      validateMainInputs();
-      console.log('ファイルが正常に読み込まれました:', file.name);
+      applyLoadedText(content);
     } else {
       throw new Error('ファイルが空です');
     }
   } catch (error) {
-    console.error('File processing error');
-    alert(error.message || 'ファイルの処理に失敗しました');
+    showError(mainTabElements.inputTextError(), error.message || 'ファイルの処理に失敗しました');
   }
 };
 
@@ -286,21 +279,37 @@ export const initMainTabEventListeners = () => {
   mainTabElements.copyButton().addEventListener('click', copyToClipboard);
   
   // 入力検証
-  mainTabElements.inputText().addEventListener('input', validateMainInputs);
+  mainTabElements.inputText().addEventListener('input', () => {
+    loadWarning = '';
+    clearMainResult();
+    validateMainInputs();
+  });
+  mainTabElements.mode().addEventListener('change', clearMainResult);
+  mainTabElements.outputFormat().addEventListener('change', () => {
+    validateMainInputs();
+    refreshMainResult();
+  });
+  const visualization = mainTabElements.visualization();
+  visualization.addEventListener('mouseover', handleCellHover);
+  visualization.addEventListener('mouseout', handleCellLeave);
+  visualization.addEventListener('click', handleCellHover);
   mainTabElements.key().addEventListener('input', (e) => {
+    clearMainResult();
     handleKeyInput(e);
     validateMainInputs();
   });
   
   // Enterキーサポート
-  mainTabElements.inputText().addEventListener('keypress', (e) => {
+  mainTabElements.inputText().addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
       processText();
     }
   });
   
-  mainTabElements.key().addEventListener('keypress', (e) => {
+  mainTabElements.key().addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       processText();
     }
   });
@@ -326,4 +335,5 @@ export const initMainTabEventListeners = () => {
 export const initMainTab = () => {
   initMainTabEventListeners();
   loadTextFromUrl();
+  validateMainInputs();
 };

@@ -20,8 +20,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--btn-height-md);
-  height: var(--btn-height-md);
+  width: 44px;
+  height: 44px;
 }
 
 #theme-toggle:hover,
@@ -31,6 +31,8 @@ button {
 
 /* プロセスボタン */
 #processButton {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
   background: var(--button-bg);
   color: var(--button-text);
   border: none;
@@ -67,8 +69,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--input-height-sm);
-  height: var(--input-height-sm);
+  width: 44px;
+  height: 44px;
   transition: all var(--transition-speed);
   margin: 0;
 }
@@ -94,8 +96,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--input-height-sm);
-  height: var(--input-height-sm);
+  width: 44px;
+  height: 44px;
   transition: all var(--transition-speed);
   margin: 0;
 }
@@ -165,7 +167,7 @@ button:disabled:hover {
   position: relative;
   display: inline-block;
   width: 44px;
-  height: 24px;
+  height: 44px;
 }
 
 .toggle-switch input {
@@ -177,10 +179,10 @@ button:disabled:hover {
 .toggle-slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
+  top: 10px;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 10px;
   background-color: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 24px;
@@ -239,8 +241,8 @@ button:disabled:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background-color: var(--input-border);
   color: var(--text-color);
@@ -284,7 +286,19 @@ button:disabled:hover {
   border-top-color: var(--text-color);
 }
 
-.indexing-mode-help:hover .help-tooltip {
+.indexing-mode-help:hover .help-tooltip,
+.indexing-mode-help:focus-within .help-tooltip,
+.indexing-mode-help.open .help-tooltip {
   opacity: 1;
   visibility: visible;
+}
+.toggle-switch:focus-within .toggle-slider {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+
+.help-icon {
+  background: var(--viz-cell-bg);
+  border: 1px solid var(--field-border);
+  flex-shrink: 0;
 }

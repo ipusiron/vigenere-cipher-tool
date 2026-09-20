@@ -3,8 +3,6 @@
  * 純粋関数による暗号化・復号ロジック
  */
 
-import { getIndexingOffset } from './indexing-mode.js';
-
 // Constants
 export const ALPHABET_SIZE = 26;
 export const CHAR_CODE_A = 'A'.charCodeAt(0);
@@ -35,10 +33,10 @@ export const repeatKey = (key, length) => {
  * @param {string} keyChar - 鍵文字（A-Z）
  * @returns {string} 暗号文字
  */
-export const encryptChar = (plainChar, keyChar) => {
+export const encryptChar = (plainChar, keyChar, offset = 0) => {
   const plainCode = plainChar.charCodeAt(0) - CHAR_CODE_A;
   const keyCode = keyChar.charCodeAt(0) - CHAR_CODE_A;
-  const offset = getIndexingOffset();
+  offset = offset === 1 ? 1 : 0;
   // A=0: (plain + key) % 26, A=1: (plain + key + 1) % 26
   return String.fromCharCode((plainCode + keyCode + offset) % ALPHABET_SIZE + CHAR_CODE_A);
 };
@@ -49,10 +47,10 @@ export const encryptChar = (plainChar, keyChar) => {
  * @param {string} keyChar - 鍵文字（A-Z）
  * @returns {string} 平文文字
  */
-export const decryptChar = (cipherChar, keyChar) => {
+export const decryptChar = (cipherChar, keyChar, offset = 0) => {
   const cipherCode = cipherChar.charCodeAt(0) - CHAR_CODE_A;
   const keyCode = keyChar.charCodeAt(0) - CHAR_CODE_A;
-  const offset = getIndexingOffset();
+  offset = offset === 1 ? 1 : 0;
   // A=0: (cipher - key + 26) % 26, A=1: (cipher - key - 1 + 26) % 26
   return String.fromCharCode((cipherCode - keyCode - offset + ALPHABET_SIZE) % ALPHABET_SIZE + CHAR_CODE_A);
 };
@@ -64,7 +62,7 @@ export const decryptChar = (cipherChar, keyChar) => {
  * @param {string} mode - 'encrypt' または 'decrypt'
  * @returns {Object} {result: string, visualization: Array}
  */
-export const vigenere = (text, key, mode = 'encrypt') => {
+export const vigenere = (text, key, mode = 'encrypt', offset = 0) => {
   const sanitizedText = sanitize(text);
   const sanitizedKey = sanitize(key);
   
@@ -81,7 +79,7 @@ export const vigenere = (text, key, mode = 'encrypt') => {
   for (let i = 0; i < sanitizedText.length; i++) {
     const inputChar = sanitizedText[i];
     const keyChar = fullKey[i];
-    const outputChar = processChar(inputChar, keyChar);
+    const outputChar = processChar(inputChar, keyChar, offset);
     
     result += outputChar;
     visualization.push({
@@ -100,11 +98,40 @@ export const vigenere = (text, key, mode = 'encrypt') => {
  * @param {string} cipherChar - 暗号文字（A-Z）
  * @returns {string} 鍵文字
  */
-export const findKeyChar = (plainChar, cipherChar) => {
+export const findKeyChar = (plainChar, cipherChar, offset = 0) => {
   const plainCode = plainChar.charCodeAt(0) - CHAR_CODE_A;
   const cipherCode = cipherChar.charCodeAt(0) - CHAR_CODE_A;
-  const offset = getIndexingOffset();
+  offset = offset === 1 ? 1 : 0;
   // A=0: (cipher - plain + 26) % 26, A=1: (cipher - plain - 1 + 26) % 26
   const keyCode = (cipherCode - plainCode - offset + ALPHABET_SIZE) % ALPHABET_SIZE;
   return String.fromCharCode(keyCode + CHAR_CODE_A);
+};
+
+/** 英字だけを変換し、元の書式と大文字小文字を保持する。 */
+export const vigenerePreserve = (text, key, mode = 'encrypt', offset = 0) => {
+  const cleanKey = sanitize(key);
+  if (!cleanKey) return '';
+  const processChar = mode === 'encrypt' ? encryptChar : decryptChar;
+  let keyIndex = 0;
+  let result = '';
+  for (const char of text) {
+    if (!/[A-Za-z]/.test(char)) {
+      result += char;
+      continue;
+    }
+    const converted = processChar(char.toUpperCase(), cleanKey[keyIndex % cleanKey.length], offset);
+    result += char === char.toLowerCase() ? converted.toLowerCase() : converted;
+    keyIndex++;
+  }
+  return result;
+};
+
+/** 末尾に空白を付けず、5文字ずつまとめる。 */
+export const groupBy5 = (text) => (text.match(/.{1,5}/gu) || []).join(' ');
+
+/** 画面の出力形式を選ぶ。未知の形式は詰めて出力する。 */
+export const formatOutput = (text, key, mode = 'encrypt', offset = 0, format = 'compact') => {
+  if (format === 'preserve') return vigenerePreserve(text, key, mode, offset);
+  const result = vigenere(text, key, mode, offset).result;
+  return format === 'group5' ? groupBy5(result) : result;
 };

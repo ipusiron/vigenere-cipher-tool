@@ -24,7 +24,9 @@
 }
 
 /* Vigenère テーブル */
-#vigenereTable {
+#vigenereTable,
+#researchTable,
+.lab-visualization {
   margin-top: var(--spacing-xl);
   overflow-x: auto;
 }
@@ -65,7 +67,7 @@
   cursor: help;
 }
 
-.vig-table td:hover {
+.vig-table td:hover:not(.highlight) {
   background-color: var(--viz-cell-bg);
 }
 

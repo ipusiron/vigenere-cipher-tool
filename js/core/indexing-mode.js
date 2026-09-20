@@ -7,14 +7,19 @@ const STORAGE_KEY = 'indexingMode';
 const DEFAULT_MODE = 0; // A=0 is default
 
 const CHAR_CODE_A = 'A'.charCodeAt(0);
+let currentOffset = DEFAULT_MODE;
+try {
+  currentOffset = localStorage.getItem(STORAGE_KEY) === '1' ? 1 : 0;
+} catch {
+  // 保存領域が使えない場合もメモリー内の値で動作する。
+}
 
 /**
  * 現在のインデックスオフセットを取得 (0 または 1)
  * @returns {number} A=0モードなら0、A=1モードなら1
  */
 export const getIndexingOffset = () => {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  return saved === '1' ? 1 : 0;
+  return currentOffset;
 };
 
 /**
@@ -31,7 +36,12 @@ export const getIndexingModeLabel = () => {
  */
 export const setIndexingMode = (offset) => {
   const validOffset = (offset === 1) ? 1 : 0;
-  localStorage.setItem(STORAGE_KEY, String(validOffset));
+  currentOffset = validOffset;
+  try {
+    localStorage.setItem(STORAGE_KEY, String(validOffset));
+  } catch {
+    // 保存できなくても現在のページでは設定を保持する。
+  }
   // カスタムイベントを発火してリスナーに通知
   window.dispatchEvent(new CustomEvent('indexingModeChanged', {
     detail: { offset: validOffset }

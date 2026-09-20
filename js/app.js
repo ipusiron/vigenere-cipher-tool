@@ -5,7 +5,10 @@
 
 import { initTheme, initThemeToggle } from './ui/theme.js';
 import { generateMainTable, generateResearchTable } from './ui/table-generator.js';
-import { initMainTab } from './features/main-tab.js';
+import { initResearchTab, refreshResearchResults } from './features/research-tab.js';
+import { initLabTab, refreshLabResults } from './features/lab-tab.js';
+import { initTabs } from './ui/tabs.js';
+import { initMainTab, refreshMainResult } from './features/main-tab.js';
 import { uiElements } from './ui/dom-elements.js';
 import { getIndexingOffset, toggleIndexingMode } from './core/indexing-mode.js';
 import { encryptChar } from './core/cipher.js';
@@ -41,10 +44,14 @@ const initIndexingModeToggle = () => {
 
     // 表の見方の例を更新
     updateTableExample();
+    refreshMainResult();
+    refreshResearchResults();
+    refreshLabResults();
 
-    console.log(`Indexing mode switched to: A=${newOffset}`);
   });
 
+  const help = document.querySelector('.indexing-mode-help button');
+  help.addEventListener('click', () => help.parentElement.classList.toggle('open'));
   // 初期状態で例を更新
   updateTableExample();
 };
@@ -72,7 +79,7 @@ const updateTableExample = () => {
   const formulaSpan = document.getElementById('table-example-formula');
 
   if (resultSpan && formulaSpan) {
-    const cipherChar = encryptChar('H', 'K');
+    const cipherChar = encryptChar('H', 'K', getIndexingOffset());
     resultSpan.textContent = cipherChar;
     formulaSpan.textContent = cipherChar;
   }
@@ -84,10 +91,14 @@ const updateTableExample = () => {
 const initModal = () => {
   const showModal = () => {
     uiElements.helpModal().classList.add('show');
+    document.body.classList.add('modal-open');
+    uiElements.modalClose().focus();
   };
   
   const hideModal = () => {
     uiElements.helpModal().classList.remove('show');
+    document.body.classList.remove('modal-open');
+    uiElements.helpToggle().focus();
   };
   
   const handleModalClick = (event) => {
@@ -107,99 +118,51 @@ const initModal = () => {
   uiElements.modalClose().addEventListener('click', hideModal);
   uiElements.helpModal().addEventListener('click', handleModalClick);
   document.addEventListener('keydown', handleEscKey);
-};
-
-/**
- * 研究タブの初期化（動的読み込み）
- */
-const initResearchTab = async () => {
-  console.log('🔬 Setting up research tab initialization...');
-  
-  // 即座にモジュールを読み込み、研究タブを初期化
-  try {
-    const module = await import('./features/research-tab.js');
-    
-    // タブが表示されたときに呼び出されるグローバル関数として設定
-    window.initResearchTabOnShow = () => {
-      console.log('🔬 Research tab shown, initializing...');
-      module.initResearchTab();
-    };
-    
-    // 少し遅延してから初期化を実行（Alpine.js完全初期化待ち）
-    setTimeout(() => {
-      console.log('🔬 Force initializing research tab...');
-      module.initResearchTab();
-    }, 500);
-    
-  } catch (error) {
-    console.error('❌ Failed to load research tab module:', error);
-  }
-};
-
-/**
- * 実験室タブの初期化（動的読み込み）
- */
-const initLabTab = async () => {
-  console.log('🧪 Setting up lab tab initialization...');
-  
-  // 即座にモジュールを読み込み、実験室タブを初期化
-  try {
-    const module = await import('./features/lab-tab.js');
-    
-    // タブが表示されたときに呼び出されるグローバル関数として設定
-    window.initLabTabOnShow = () => {
-      console.log('🧪 Lab tab shown, initializing...');
-      module.initLabTab();
-    };
-    
-    // 少し遅延してから初期化を実行（Alpine.js完全初期化待ち）
-    setTimeout(() => {
-      console.log('🧪 Force initializing lab tab...');
-      module.initLabTab();
-    }, 600);
-    
-  } catch (error) {
-    console.error('❌ Failed to load lab tab module:', error);
-  }
+  uiElements.helpModal().addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') return;
+    const focusable = [...uiElements.helpModal().querySelectorAll('button, a[href], input, select, [tabindex="0"]')];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 };
 
 /**
  * アプリケーション全体の初期化
  */
-const initApplication = async () => {
-  console.log('🚀 Initializing Vigenère Cipher Tool...');
+const initApplication = () => {
   
   try {
     // 1. テーマシステムの初期化
-    initTheme();
+    initTheme(true);
     initThemeToggle(uiElements.themeToggle());
-    console.log('✅ Theme system initialized');
 
     // 2. インデックスモードトグルの初期化
     initIndexingModeToggle();
-    console.log('✅ Indexing mode toggle initialized');
 
     // 3. メインのヴィジュネル表を生成
     generateMainTable(document.getElementById('vigenereTable'));
-    console.log('✅ Main Vigenère table generated');
 
     // 4. メインタブの初期化
     initMainTab();
-    console.log('✅ Main tab initialized');
 
     // 5. モーダルの初期化
     initModal();
-    console.log('✅ Modal system initialized');
 
-    // 6. 他のタブの遅延初期化
-    await initResearchTab();
-    await initLabTab();
-    console.log('✅ Tab observers initialized');
+    // 6. 他のタブを1回だけ初期化
+    initResearchTab();
+    initLabTab();
+    initTabs();
     
-    console.log('🎉 Application initialization complete!');
     
   } catch (error) {
-    console.error('❌ Application initialization failed:', error);
+    console.error('Application initialization failed');
     
     // エラー時のフォールバック
     alert('アプリケーションの初期化に失敗しました。ページを再読み込みしてください。');
@@ -215,15 +178,3 @@ if (document.readyState === 'loading') {
   // 既にDOMが読み込まれている場合は即座に実行
   initApplication();
 }
-
-// デバッグ用のグローバル関数をエクスポート
-window.VigenereApp = {
-  initApplication,
-  version: '2.0.0',
-  modules: {
-    theme: () => import('./ui/theme.js'),
-    cipher: () => import('./core/cipher.js'),
-    validation: () => import('./core/validation.js'),
-    utils: () => import('./core/utils.js')
-  }
-};

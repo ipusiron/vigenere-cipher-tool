@@ -3,7 +3,8 @@
  * テーブル生成の責任を担当
  */
 
-import { ALPHABET_SIZE, CHAR_CODE_A } from '../core/cipher.js';
+import { ALPHABET_SIZE, CHAR_CODE_A, encryptChar } from '../core/cipher.js';
+import { VIZ_MAX_CHARS } from '../core/input.js';
 import { getIndexingOffset } from '../core/indexing-mode.js';
 
 /**
@@ -25,7 +26,8 @@ export const createTooltip = (plainChar, keyChar, cipherChar) => {
  * @param {Event} event - マウスイベント
  */
 export const showTooltip = (event) => {
-  const td = event.currentTarget;
+  const td = event.target.closest('td');
+  if (!td) return;
   const tooltip = td.querySelector('.tooltip');
   if (tooltip) {
     tooltip.classList.add('show');
@@ -37,7 +39,8 @@ export const showTooltip = (event) => {
  * @param {Event} event - マウスイベント
  */
 export const hideTooltip = (event) => {
-  const td = event.currentTarget;
+  const td = event.target.closest('td');
+  if (!td) return;
   const tooltip = td.querySelector('.tooltip');
   if (tooltip) {
     tooltip.classList.remove('show');
@@ -85,9 +88,9 @@ export const generateVigenereTable = (container, tableClass = 'vig-table') => {
     for (let col = 0; col < ALPHABET_SIZE; col++) {
       const td = document.createElement('td');
       // A=0: (row + col) % 26, A=1: (row + col + 1) % 26
-      const cipherChar = String.fromCharCode(((row + col + offset) % ALPHABET_SIZE) + CHAR_CODE_A);
       const plainChar = String.fromCharCode(CHAR_CODE_A + col);
       const keyChar = String.fromCharCode(CHAR_CODE_A + row);
+      const cipherChar = encryptChar(plainChar, keyChar, offset);
       
       td.textContent = cipherChar;
       td.classList.add('tooltip-container');
@@ -100,9 +103,6 @@ export const generateVigenereTable = (container, tableClass = 'vig-table') => {
       const tooltip = createTooltip(plainChar, keyChar, cipherChar);
       td.appendChild(tooltip);
       
-      // イベントリスナーを追加
-      td.addEventListener('mouseenter', showTooltip);
-      td.addEventListener('mouseleave', hideTooltip);
       
       tr.appendChild(td);
     }
@@ -110,6 +110,16 @@ export const generateVigenereTable = (container, tableClass = 'vig-table') => {
     table.appendChild(tr);
   }
   
+  table.addEventListener('pointerover', (event) => {
+    if (event.pointerType === 'mouse') showTooltip(event);
+  });
+  table.addEventListener('pointerout', (event) => {
+    if (event.pointerType === 'mouse') hideTooltip(event);
+  });
+  table.addEventListener('click', (event) => {
+    const tooltip = event.target.closest('td')?.querySelector('.tooltip');
+    if (tooltip) tooltip.classList.toggle('show');
+  });
   return table;
 };
 
@@ -119,7 +129,9 @@ export const generateVigenereTable = (container, tableClass = 'vig-table') => {
  */
 export const generateMainTable = (container) => {
   const table = generateVigenereTable(container, 'vig-table');
-  container.innerHTML = '<h3>ヴィジュネル表（タブラ・レクタ）</h3>';
+  const title = document.createElement('h3');
+  title.textContent = 'ヴィジュネル表（タブラ・レクタ）';
+  container.replaceChildren(title);
   container.appendChild(table);
 };
 
@@ -129,7 +141,9 @@ export const generateMainTable = (container) => {
  */
 export const generateResearchTable = (container) => {
   const table = generateVigenereTable(container, 'vig-table research-table');
-  container.innerHTML = '<h3>ヴィジュネル表（タブラ・レクタ）</h3>';
+  const title = document.createElement('h3');
+  title.textContent = 'ヴィジュネル表（タブラ・レクタ）';
+  container.replaceChildren(title);
   container.appendChild(table);
 };
 
@@ -262,10 +276,18 @@ export const displayVisualization = (container, data, mode = 'encrypt') => {
   // モードに応じてタイトルを変更
   const isEncrypt = mode === 'encrypt';
   const title = isEncrypt 
-    ? '<h3>対応関係（平文＋鍵 → 出力）</h3>'
-    : '<h3>対応関係（暗号文＋鍵 → 出力）</h3>';
+    ? '対応関係（平文＋鍵 → 出力）'
+    : '対応関係（暗号文＋鍵 → 出力）';
   
-  container.innerHTML = title;
+  const heading = document.createElement('h3');
+  heading.textContent = title;
+  container.replaceChildren(heading);
+  if (data.length > VIZ_MAX_CHARS) {
+    const notice = document.createElement('p');
+    notice.textContent = `対応表は先頭1,000文字だけを表示しています（全${data.length.toLocaleString('en-US')}文字）`;
+    container.appendChild(notice);
+  }
+  data = data.slice(0, VIZ_MAX_CHARS);
   
   const table = document.createElement('div');
   table.className = 'viz-table';

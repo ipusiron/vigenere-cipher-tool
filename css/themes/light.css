@@ -12,10 +12,15 @@
   /* Interactive elements */
   --input-bg: #ffffff;
   --input-border: #cccccc;
-  --button-bg: #007bff;
+  --button-bg: #0062cc;
   --button-text: #ffffff;
-  --link-color: #007bff;
+  --link-color: #0062cc;
   
+  --accent-text: #0062cc;
+  --footer-text: #555555;
+  --placeholder-text: #666666;
+  --field-border: #8c8c8c;
+
   /* Visualization elements */
   --viz-header-bg: #e9ecef;
   --viz-cell-bg: #f8f9fa;
@@ -23,15 +28,51 @@
   --table-header-bg: #f2f2f2;
   
   /* Message colors */
-  --message-warning-text: #856404;
+  --message-warning-text: #664d03;
   --message-warning-bg: #fff3cd;
   --message-warning-border: #ffeaa7;
   
-  --message-error-text: #dc3545;
+  --message-error-text: #a71d2a;
   --message-error-bg: #f8d7da;
   --message-error-border: #f5c6cb;
   
   /* Tooltip colors */
-  --tooltip-bg: rgba(0, 0, 0, 0.9);
+  --tooltip-bg: #1a1a1a;
   --tooltip-text: #ffffff;
+}
+
+/**
+ * Semantic Color Variables
+ * 意味的な色の定義（状態やコンテキスト）
+ */
+:root {
+  /* State colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Success variants */
+  --success-50: #ecfdf5;
+  --success-100: #d1fae5;
+  --success-500: var(--color-success);
+  --success-900: #064e3b;
+
+  /* Warning variants */
+  --warning-50: #fffbeb;
+  --warning-100: #fef3c7;
+  --warning-500: var(--color-warning);
+  --warning-900: #78350f;
+
+  /* Error variants */
+  --error-50: #fef2f2;
+  --error-100: #fee2e2;
+  --error-500: var(--color-error);
+  --error-900: #7f1d1d;
+
+  /* Info variants */
+  --info-50: #eff6ff;
+  --info-100: #dbeafe;
+  --info-500: var(--color-info);
+  --info-900: #1e3a8a;
 }

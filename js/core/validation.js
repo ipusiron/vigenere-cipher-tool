@@ -4,6 +4,7 @@
  */
 
 import { sanitize } from './cipher.js';
+import { analyzeInput, MAX_FILE_BYTES } from './input.js';
 
 /**
  * 入力検証の結果
@@ -18,40 +19,26 @@ import { sanitize } from './cipher.js';
  * @param {string} inputText - 入力テキスト
  * @returns {ValidationResult} 検証結果
  */
-export const validateInputText = (inputText) => {
-  if (!inputText) {
-    return { isValid: true, type: 'none', message: '' };
-  }
-
-  const sanitizedInput = sanitize(inputText);
-  
-  // 全角文字や非ASCII文字のチェック
-  const hasInvalidChars = /[^\x00-\x7F]/.test(inputText) || /[ａ-ｚＡ-Ｚ０-９]/.test(inputText);
-  
-  if (hasInvalidChars) {
+export const validateInputText = (inputText, format = 'compact') => {
+  if (!inputText) return { isValid: true, type: 'none', message: '' };
+  const { letters, fullwidthLatin, ignored } = analyzeInput(inputText);
+  if (fullwidthLatin) {
     return {
-      isValid: false,
-      type: 'error',
-      message: '全角文字は使用できません（半角のみ有効）'
+      isValid: false, type: 'error',
+      message: `全角の英字が${fullwidthLatin}文字あります。半角に直してください`
     };
   }
-  
-  if (sanitizedInput.length === 0) {
+  if (!letters) {
+    return { isValid: false, type: 'error', message: 'アルファベット（A-Z）を含む文字を入力してください' };
+  }
+  if (ignored) {
     return {
-      isValid: false,
-      type: 'error',
-      message: 'アルファベット（A-Z）を含む文字を入力してください'
+      isValid: true, type: 'warning',
+      message: format === 'preserve'
+        ? `英字以外の${ignored}文字は変換せず、そのまま出力します`
+        : `英字以外の${ignored}文字は無視されます（記号・数字・空白・日本語など）`
     };
   }
-  
-  if (sanitizedInput.length < inputText.length) {
-    return {
-      isValid: true,
-      type: 'warning',
-      message: '記号・数字・空白は無視されて処理されます（英字のみ使用）'
-    };
-  }
-  
   return { isValid: true, type: 'none', message: '' };
 };
 
@@ -76,29 +63,9 @@ export const validateKey = (keyText) => {
  * @returns {ValidationResult} 検証結果
  */
 export const validateLabText = (text) => {
-  if (!text.trim()) {
-    return { isValid: false, type: 'none', message: '' };
-  }
-  
-  const sanitizedText = sanitize(text);
-  
-  if (sanitizedText.length === 0) {
-    return {
-      isValid: false,
-      type: 'error',
-      message: 'アルファベット（A-Z）を含む文字を入力してください'
-    };
-  }
-  
-  if (sanitizedText.length !== text.replace(/[^a-zA-Z]/g, '').length) {
-    return {
-      isValid: true,
-      type: 'warning',
-      message: 'アルファベット以外の文字は無視されます'
-    };
-  }
-  
-  return { isValid: true, type: 'none', message: '' };
+  if (!text) return { isValid: false, type: 'none', message: '' };
+  const validation = validateInputText(text);
+  return validation.isValid ? { isValid: true, type: 'none', message: '' } : validation;
 };
 
 /**
@@ -130,13 +97,13 @@ export const validateCaesarKey = (key) => {
  * @returns {ValidationResult} 検証結果
  */
 export const validateFile = (file) => {
-  const maxSize = 10 * 1024 * 1024; // 10MB
+  const maxSize = MAX_FILE_BYTES;
   
   if (file.size > maxSize) {
     return {
       isValid: false,
       type: 'error',
-      message: 'ファイルサイズが大きすぎます（最大: 10MB）'
+      message: 'ファイルサイズが大きすぎます（最大: 1MB）'
     };
   }
   
@@ -144,7 +111,7 @@ export const validateFile = (file) => {
   const isTextFile = fileName.endsWith('.txt') || 
                     fileName.endsWith('.text') || 
                     file.type === 'text/plain' ||
-                    file.type === '';
+                    (file.type === '' && !/\.[^.]+$/.test(fileName));
   
   if (!isTextFile) {
     return {
