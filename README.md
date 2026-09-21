@@ -352,8 +352,6 @@ vigenere-cipher-tool/
 ├── README.md
 ├── TECHNICAL.md
 ├── assets/
-│   ├── screenshot.png
-│   ├── screenshot2.png
 │   ├── screenshot3.png
 │   ├── screenshot4.png
 │   ├── screenshot5.png
