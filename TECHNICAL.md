@@ -47,6 +47,8 @@ export const decryptChar = (cipherChar, keyChar, offset = 0) => {
 A=1でも表示上の式は(平文+鍵) mod 26で、剰余0は26と読みます。
 内部の文字コードは0始まりなので、offsetを加減します。offsetは数値1だけを1として扱います。
 formula.jsはこの表示上の計算を担当し、負の剰余を0〜25に直します。
+文言は持たず`{ left, right, operator, value, readAs26, char }`を返し、`js/ui/formula-text.js`が言語ごとの1行に組み立てます。
+「0は26と読む」という注記も辞書側にあるので、表示言語を変えても計算には触れません。
 
 #### 鍵の循環システム
 ```javascript
@@ -71,10 +73,15 @@ export const repeatKey = (key, length) => {
 js/
 ├── core/               # cipher・formula・random・input・validation・indexing-mode・utils
 ├── features/           # main-tab・research-tab・lab-tab
-├── ui/                 # tabs・theme・dom-elements・message-display・table-generator
+├── ui/                 # tabs・theme・dom-elements・message-display・table-generator・formula-text
+├── i18n.js             # 日英の辞書と、data-i18n/data-i18n-<attr> の適用
 ├── theme-init.js       # 描画前にテーマを選ぶ通常スクリプト
 └── app.js              # 起動処理とモーダル
 ```
+
+coreとfeaturesは文言を持ちません。辞書のキーと差し込み値だけを返し、訳すのは表示の直前です。
+言語の選択は`?lang=` → localStorage → `navigator.language`の順で決め、`languagechange`で描き直します。
+結果が出ていないときは描き直しません。空の状態が勝手に開かないようにするためです。
 
 #### モジュールの依存関係設計
 ```javascript
@@ -187,28 +194,28 @@ css/
 
 ```javascript
 export const validateInputText = (inputText, format = 'compact') => {
-  if (!inputText) return { isValid: true, type: 'none', message: '' };
+  if (!inputText) return silent(true);
   const { letters, fullwidthLatin, ignored } = analyzeInput(inputText);
   if (fullwidthLatin) {
-    return {
-      isValid: false, type: 'error',
-      message: `全角の英字が${fullwidthLatin}文字あります。半角に直してください`
-    };
+    return { isValid: false, type: 'error', key: 'error.fullwidth', params: { count: fullwidthLatin } };
   }
   if (!letters) {
-    return { isValid: false, type: 'error', message: 'アルファベット（A-Z）を含む文字を入力してください' };
+    return { isValid: false, type: 'error', key: 'error.noLetters', params: {} };
   }
   if (ignored) {
     return {
       isValid: true, type: 'warning',
-      message: format === 'preserve'
-        ? `英字以外の${ignored}文字は変換せず、そのまま出力します`
-        : `英字以外の${ignored}文字は無視されます（記号・数字・空白・日本語など）`
+      key: format === 'preserve' ? 'warning.ignoredPreserve' : 'warning.ignored',
+      params: { count: ignored }
     };
   }
-  return { isValid: true, type: 'none', message: '' };
+  return silent(true);
 };
 ```
+
+検証は表示用の文ではなく辞書のキーと差し込み値を返します。
+`message-display.js`が`data-message-key`にキーを覚えるので、表示したままでも言語を切り替えれば訳し直せます。
+ファイルやURLに対する指摘は`loadError`として持ち続け、検証の描き直しで消えないようにしています。
 
 ### 読み込みと上限
 

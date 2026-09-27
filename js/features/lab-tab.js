@@ -10,18 +10,19 @@ import { generateRandomKey } from '../core/random.js';
 import { labTabElements } from '../ui/dom-elements.js';
 import { displayVisualization } from '../ui/table-generator.js';
 import { displayValidationMessage, showError } from '../ui/message-display.js';
+import { I18n } from '../i18n.js';
 
 /**
  * 実験室タブの初期化フラグ
  */
 let isInitialized = false;
 
-/** 結果の1行を入力のHTML解釈なしで追加する。 */
-const appendResult = (container, label, value, highlight = false) => {
+/** 結果の1行を入力のHTML解釈なしで追加する。ラベルは辞書のキーで受け取る。 */
+const appendResult = (container, labelKey, value, highlight = false) => {
   const item = document.createElement('div');
   item.className = 'result-item';
   const title = document.createElement('strong');
-  title.textContent = label + ': ';
+  title.textContent = I18n.t(labelKey) + ': ';
   const content = document.createElement('span');
   content.textContent = value;
   if (highlight) content.className = 'highlight-text';
@@ -83,7 +84,7 @@ export const validateOTPInputs = () => {
     otpHasResult = false;
     labTabElements.otpResult().replaceChildren();
   }
-  if (otpNeedsKey) showError(textError, '平文が変わりました。鍵を生成し直してください');
+  if (otpNeedsKey) showError(textError, 'lab.keyStale');
   
   generateKeyButton.disabled = !(hasValidText && textValidation.isValid);
   button.disabled = !(hasValidText && hasKey && textValidation.isValid);
@@ -109,13 +110,13 @@ export const experimentCaesar = () => {
   const shiftAmount = getCharDisplayValue(key);
 
   resultDiv.replaceChildren();
-  appendResult(resultDiv, '入力', text);
-  appendResult(resultDiv, '処理対象（英字のみ）', sanitizedText);
-  appendResult(resultDiv, '鍵（1文字）', key);
-  appendResult(resultDiv, '繰り返された鍵', repeatKey(key, sanitizedText.length));
-  appendResult(resultDiv, '暗号文', result, true);
-  appendResult(resultDiv, 'シフト量', String(shiftAmount));
-  appendResult(resultDiv, '観察', `すべての文字を同じ量だけずらすシーザー暗号です（${modeLabel}）。`);
+  appendResult(resultDiv, 'lab.resultInput', text);
+  appendResult(resultDiv, 'lab.resultSanitized', sanitizedText);
+  appendResult(resultDiv, 'lab.resultKeyOne', key);
+  appendResult(resultDiv, 'lab.resultRepeatedKey', repeatKey(key, sanitizedText.length));
+  appendResult(resultDiv, 'lab.resultCipher', result, true);
+  appendResult(resultDiv, 'lab.resultShift', String(shiftAmount));
+  appendResult(resultDiv, 'lab.resultObservation', I18n.t('lab.caesarObservation', { mode: modeLabel }));
   caesarHasResult = true;
 };
 
@@ -127,7 +128,7 @@ export const generateRandomKeyForOTP = () => {
   const sanitizedText = sanitize(otpText);
   
   if (!sanitizedText) {
-    showError(labTabElements.otpTextError(), 'まず平文を入力してください');
+    showError(labTabElements.otpTextError(), 'lab.needPlain');
     return;
   }
   
@@ -157,15 +158,15 @@ export const experimentOTP = () => {
   const { result, visualization } = vigenere(text, key, 'encrypt', getIndexingOffset());
 
   resultDiv.replaceChildren();
-  appendResult(resultDiv, '平文', sanitizedText);
-  appendResult(resultDiv, 'ランダム鍵', key);
-  appendResult(resultDiv, '暗号文', result, true);
+  appendResult(resultDiv, 'lab.resultPlain', sanitizedText);
+  appendResult(resultDiv, 'lab.resultRandomKey', key);
+  appendResult(resultDiv, 'lab.resultCipher', result, true);
   const visualizationContainer = document.createElement('div');
   visualizationContainer.className = 'lab-visualization';
   displayVisualization(visualizationContainer, visualization);
   resultDiv.appendChild(visualizationContainer);
-  appendResult(resultDiv, '観察', `鍵の長さが平文と同じ（${key.length}文字）`);
-  appendResult(resultDiv, '注意', 'ブラウザーの乱数による実験です。鍵の配送・破棄までは再現しません。');
+  appendResult(resultDiv, 'lab.resultObservation', I18n.t('lab.otpObservation', { count: key.length }));
+  appendResult(resultDiv, 'lab.resultCaution', I18n.t('lab.otpCaution'));
   otpHasResult = true;
 };
 

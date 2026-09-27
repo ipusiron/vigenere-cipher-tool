@@ -37,6 +37,8 @@ hub: true
 
 # Vigenere Cipher Tool - ヴィジュネル暗号の学習ツール
 
+[English](README.en.md) · 日本語
+
 ![GitHub Repo stars](https://img.shields.io/github/stars/ipusiron/vigenere-cipher-tool?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/ipusiron/vigenere-cipher-tool?style=social)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ipusiron/vigenere-cipher-tool)
@@ -139,6 +141,7 @@ Vigenere Cipher Toolは、ブラウザー内でヴィジュネル暗号の暗号
 ### 🎨 全体的なUI/UX機能
 
 **🌙 テーマ・表示**
+- **日本語・英語の切り替え**: ヘッダーのボタンで表示言語を切り替え（`?lang=ja` / `?lang=en` でも指定可能。選択は自動保存）
 - **ダークモード**: ライト/ダーク テーマ切り替え（設定自動保存）
 - **表モード切替（A=0 / A=1）**: ヴィジュネル表の計算方式を切り替え可能
   - A=0モード: A=0, B=1, ..., Z=25（一般的な方式、A+A=A）
@@ -315,7 +318,7 @@ Vigenere Cipher Toolは、ブラウザー内でヴィジュネル暗号の暗号
 ## 🔒 セキュリティとプライバシー
 
 処理はすべてブラウザー内で行い、ツールから外部への通信は0件です。
-入力・鍵・出力は保存せず、localStorageに保存するのはテーマと表モードだけです。
+入力・鍵・出力は保存せず、localStorageに保存するのはテーマ・表モード・表示言語だけです。
 保存領域が利用できなくても動作します。
 
 meta CSPはscript-srcとstyle-srcをselfに限定し、connect-srcはnoneにしています。
@@ -330,6 +333,7 @@ metaではframe-ancestorsが無効なため、埋め込み禁止を強制する�
 Node 22以上で`npm test`を実行します。依存パッケージはありません。
 GitHub Actionsでpushとpull_requestのたびに同じテストを実行します。
 暗号の既知解答、数式、入力境界、乱数、配色、READMEの動作例も検証します。
+日英の辞書についても、キーの一致・差し込み名の一致・HTMLの控えの文言との一致・英語側に和文が残っていないことを検証します。
 
 ## 🔗 関連リンク
 
@@ -349,6 +353,7 @@ vigenere-cipher-tool/
 ├── .gitignore
 ├── CLAUDE.md
 ├── LICENSE
+├── README.en.md           # 英語版README
 ├── README.md
 ├── TECHNICAL.md
 ├── assets/
@@ -393,9 +398,11 @@ vigenere-cipher-tool/
 │   │   ├── lab-tab.js
 │   │   ├── main-tab.js
 │   │   └── research-tab.js
+│   ├── i18n.js            # 日英の辞書とDOMへの適用
 │   ├── theme-init.js
 │   └── ui/
 │       ├── dom-elements.js
+│       ├── formula-text.js # 式の部品を言語ごとの1行に組み立てる
 │       ├── message-display.js
 │       ├── table-generator.js
 │       ├── tabs.js
@@ -408,6 +415,7 @@ vigenere-cipher-tool/
     ├── formula.test.js
     ├── helpers.js
     ├── html.test.js
+    ├── i18n.test.js
     ├── input.test.js
     ├── random.test.js
     ├── readme.test.js

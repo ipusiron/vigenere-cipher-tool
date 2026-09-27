@@ -12,7 +12,9 @@ test('pure core modules and isolated guarded storage', () => {
     assert.doesNotMatch(read(`js/core/${name}.js`), /localStorage|document|window/);
   }
   const storage = files('js').filter(file => /localStorage/.test(read(file))).sort();
-  assert.deepEqual(storage, ['js/core/indexing-mode.js', 'js/theme-init.js', 'js/ui/theme.js']);
+  assert.deepEqual(storage, [
+    'js/core/indexing-mode.js', 'js/i18n.js', 'js/theme-init.js', 'js/ui/theme.js'
+  ]);
   for (const file of storage) assert.match(read(file), /try\s*\{[\s\S]+catch/);
 });
 test('technical code excerpts use existing declaration names', () => {

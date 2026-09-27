@@ -12,6 +12,19 @@ import { initMainTab, refreshMainResult } from './features/main-tab.js';
 import { uiElements } from './ui/dom-elements.js';
 import { getIndexingOffset, toggleIndexingMode } from './core/indexing-mode.js';
 import { encryptChar } from './core/cipher.js';
+import { I18n } from './i18n.js';
+import { refreshMessages } from './ui/message-display.js';
+
+/**
+ * 表モードのトグルの読み上げラベルを、いまの状態から組み立てる
+ * data-i18n-aria-label を付けると切り替えで状態が巻き戻るため、ここで毎回作る。
+ */
+const updateIndexingModeAria = () => {
+  const toggle = uiElements.indexingModeToggle();
+  if (!toggle) return;
+  const nextMode = toggle.checked ? 'A=0' : 'A=1';
+  toggle.setAttribute('aria-label', I18n.t('header.indexingSwitchTo', { mode: nextMode }));
+};
 
 /**
  * インデックスモードトグルの初期化
@@ -31,6 +44,7 @@ const initIndexingModeToggle = () => {
   if (label) {
     label.textContent = currentOffset === 0 ? 'A=0' : 'A=1';
   }
+  updateIndexingModeAria();
 
   // 変更イベントリスナー
   toggle.addEventListener('change', () => {
@@ -38,6 +52,7 @@ const initIndexingModeToggle = () => {
     if (label) {
       label.textContent = newOffset === 0 ? 'A=0' : 'A=1';
     }
+    updateIndexingModeAria();
 
     // テーブルを再生成
     regenerateAllTables();
@@ -73,16 +88,21 @@ const regenerateAllTables = () => {
 
 /**
  * 表の見方の例を更新（H + K の結果）
+ * 文と結果の文字が混ざる行なので、HTMLに直書きせず毎回ここで組み立てる。
  */
 const updateTableExample = () => {
-  const resultSpan = document.getElementById('table-example-result');
-  const formulaSpan = document.getElementById('table-example-formula');
+  const paragraph = document.getElementById('table-example-text');
+  if (!paragraph) return;
 
-  if (resultSpan && formulaSpan) {
-    const cipherChar = encryptChar('H', 'K', getIndexingOffset());
-    resultSpan.textContent = cipherChar;
-    formulaSpan.textContent = cipherChar;
-  }
+  const cipherChar = encryptChar('H', 'K', getIndexingOffset());
+  const formula = document.createElement('span');
+  formula.className = 'example-formula';
+  formula.textContent = `${cipherChar}←shift(H, K)`;
+  paragraph.replaceChildren(
+    document.createTextNode(I18n.t('tabula.example', { char: cipherChar })),
+    document.createElement('br'),
+    formula
+  );
 };
 
 /**
@@ -134,11 +154,38 @@ const initModal = () => {
 };
 
 /**
+ * 言語切り替えボタンの配線
+ * 切り替えでは、結果が出ているものだけを描き直す。空の状態は空のまま保つ。
+ */
+const initLanguageToggle = () => {
+  const button = document.getElementById('langToggle');
+  if (button) {
+    button.addEventListener('click', () => {
+      I18n.setLanguage(I18n.language === 'ja' ? 'en' : 'ja');
+    });
+  }
+
+  document.addEventListener('languagechange', () => {
+    updateIndexingModeAria();
+    regenerateAllTables();
+    updateTableExample();
+    refreshMessages();
+    refreshMainResult();
+    refreshResearchResults();
+    refreshLabResults();
+  });
+};
+
+/**
  * アプリケーション全体の初期化
  */
 const initApplication = () => {
-  
+
   try {
+    // 0. 表示言語の決定（?lang → 保存値 → ブラウザーの設定）
+    I18n.init();
+    initLanguageToggle();
+
     // 1. テーマシステムの初期化
     initTheme(true);
     initThemeToggle(uiElements.themeToggle());
@@ -159,13 +206,19 @@ const initApplication = () => {
     initResearchTab();
     initLabTab();
     initTabs();
-    
-    
+
+
   } catch (error) {
     console.error('Application initialization failed');
-    
+
     // エラー時のフォールバック
-    alert('アプリケーションの初期化に失敗しました。ページを再読み込みしてください。');
+    let message = 'The tool failed to start. Reload the page and try again.';
+    try {
+      message = I18n.t('app.initError');
+    } catch {
+      // 辞書が読めないほどの失敗では、英語の定型文だけを出す。
+    }
+    alert(message);
   }
 };
 

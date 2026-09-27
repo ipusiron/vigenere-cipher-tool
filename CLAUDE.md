@@ -28,19 +28,21 @@ All three feature modules are statically imported and initialized once. ARIA tab
 
 ### Core Logic Layer (`js/core/`)
 - **cipher.js**: Pure cryptographic functions - vigenere encryption/decryption, character operations
-- **validation.js**: Input validation with detailed error messages and warnings
-- **utils.js**: Raw UTF-8 file reading with FileReader
-- **formula.js**: Display-number formulas with explicit mod 26
+- **validation.js**: Input validation returning dictionary keys and substitution values, never wording
+- **utils.js**: Raw UTF-8 file reading with FileReader; rejects with dictionary keys
+- **formula.js**: Display-number formula parts with explicit mod 26, wording-free
 - **random.js**: crypto.getRandomValues, rejecting bytes >= 234 before modulo 26
 - **input.js**: Input limits, loaded text normalization, URL parameters, code-point counts
 - **indexing-mode.js**: Cached offset with guarded localStorage
 
 ### UI Management Layer (`js/ui/`)
 - **dom-elements.js**: Centralized DOM element access with null-safety
-- **message-display.js**: Toast notifications, warnings, and error display
+- **message-display.js**: Toast notifications, warnings, and error display; remembers keys in `data-message-key`
 - **table-generator.js**: Vigenère table (tabula recta) generation and interactive highlighting
+- **formula-text.js**: Builds one line of arithmetic from the parts formula.js returns
 - **theme.js**: Guarded theme storage; saved value or system preference
 - **tabs.js**: Three ARIA tabs with ArrowLeft/Right and Home/End
+- **../i18n.js**: Japanese and English dictionaries, `data-i18n` / `data-i18n-<attr>` application, guarded storage
 - **../theme-init.js**: Synchronous pre-render theme selection
 
 ### Feature Layer (`js/features/`)
@@ -100,8 +102,15 @@ Follow the existing modular pattern - UI logic in `js/ui/`, feature logic in `js
 2. Update `js/app.js` if new initialization is needed
 3. Follow existing patterns for DOM element access via `dom-elements.js`
 
+### When touching wording
+Every string a person reads belongs in `js/i18n.js`. Core and feature modules hand around `{ key, params }`
+and translate at the last moment. Never put `data-i18n` on an element that owns children, on a slot a script
+writes into, or on an attribute whose value changes with state (the table-mode toggle builds its own
+`aria-label`). Keep the Japanese fallback text in `index.html` equal to the `ja` dictionary; a test enforces it.
+
 ### UI contracts
 
 Button and keyboard execution share validation. Mode changes clear results; offset changes recalculate existing results.
+A language change redraws only what is already showing, so empty panels stay empty.
 OTP keys must match the plaintext letter count and must not regenerate on offset changes.
 Only theme and indexing mode are persisted; never persist input, keys, or output format.
