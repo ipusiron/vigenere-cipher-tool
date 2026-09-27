@@ -8,6 +8,8 @@ import { getIndexingOffset } from '../core/indexing-mode.js';
 import { encryptFormula, keyFormula } from '../core/formula.js';
 import { researchTabElements } from '../ui/dom-elements.js';
 import { generateResearchTable, highlightResearchCell } from '../ui/table-generator.js';
+import { formatFormula } from '../ui/formula-text.js';
+import { renderMessage, renderText } from '../ui/message-display.js';
 
 /**
  * 研究タブの初期化フラグ
@@ -43,7 +45,7 @@ export const researchTabula = () => {
   
   if (!plainChar || !keyChar) {
     cipherResultSpan.textContent = '―';
-    resultDiv.textContent = '平文文字と鍵文字を選択してください';
+    renderMessage(resultDiv, 'tabula.selectBoth');
     return;
   }
   
@@ -54,8 +56,8 @@ export const researchTabula = () => {
 
   // インデックスモードに応じた表示値を取得
   const offset = getIndexingOffset();
-  resultDiv.textContent = encryptFormula(plainChar, keyChar, offset);
-  
+  renderText(resultDiv, formatFormula(encryptFormula(plainChar, keyChar, offset)));
+
   // テーブルが存在しない場合は生成
   if (!researchTabElements.researchTable().querySelector('table')) {
     initResearchTable();
@@ -76,7 +78,7 @@ export const researchReverseTabula = () => {
   
   if (!plainChar || !cipherChar) {
     keyResultSpan.textContent = '―';
-    resultDiv.textContent = '平文文字と暗号文文字を選択してください';
+    renderMessage(resultDiv, 'tabula.selectBothReverse');
     return;
   }
   
@@ -87,8 +89,8 @@ export const researchReverseTabula = () => {
 
   // インデックスモードに応じた表示値を取得
   const offset = getIndexingOffset();
-  resultDiv.textContent = keyFormula(plainChar, cipherChar, offset);
-  
+  renderText(resultDiv, formatFormula(keyFormula(plainChar, cipherChar, offset)));
+
   // 関連セルをハイライト
   highlightResearchCell(plainChar, keyChar);
 };

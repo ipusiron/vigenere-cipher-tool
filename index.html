@@ -4,32 +4,50 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ヴィジュネル暗号ツール（Vigenere Cipher Tool）</title>
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  
+
   <!-- Security Headers -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="no-referrer">
-  
+
+  <!-- Description and social cards: 言語に応じて content を差し替える -->
+  <meta name="description" data-i18n-content="app.description"
+        content="ヴィジュネル暗号の暗号化・復号、タブラ・レクタの研究、シーザー暗号とワンタイムパッドの実験ができる学習ツール。ブラウザー内だけで動きます。">
+  <meta name="keywords" data-i18n-content="app.keywords"
+        content="ヴィジュネル暗号,多表式換字暗号,タブラ・レクタ,シーザー暗号,ワンタイムパッド,古典暗号,暗号学習">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ipusiron.github.io/vigenere-cipher-tool/">
+  <meta property="og:title" data-i18n-content="app.ogTitle" content="ヴィジュネル暗号ツール">
+  <meta property="og:description" data-i18n-content="app.ogDescription"
+        content="ヴィジュネル表をたどりながら、暗号化・復号と文字の対応を学べるツールです。">
+  <meta property="og:site_name" data-i18n-content="app.ogSiteName" content="生成AIで作るセキュリティツール100">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" data-i18n-content="app.twitterTitle" content="ヴィジュネル暗号ツール">
+  <meta name="twitter:description" data-i18n-content="app.twitterDescription"
+        content="暗号化・復号、タブラ・レクタの研究、シーザー暗号とワンタイムパッドの実験ができます。">
+
   <link rel="stylesheet" href="css/main.css" />
   <script src="js/theme-init.js"></script>
 </head>
 <body>
-  <noscript>このツールを使うには、ブラウザーのJavaScriptを有効にしてください。</noscript>
+  <noscript>このツールを使うには、ブラウザーのJavaScriptを有効にしてください。 / Enable JavaScript in your browser to use this tool.</noscript>
   <div class="container">
     <div class="header-container">
-      <h1>ヴィジュネル暗号ツール<br>（Vigenere Cipher Tool）</h1>
+      <h1><span data-i18n="app.headingLine1">ヴィジュネル暗号ツール</span><br><span data-i18n="app.headingLine2">（Vigenere Cipher Tool）</span></h1>
       <div class="header-controls">
         <div class="header-buttons">
-          <button id="help-toggle" aria-label="ヘルプ">
+          <button id="langToggle" type="button" data-i18n="app.langButton"
+                  data-i18n-aria-label="app.langAria" aria-label="言語を切り替える">English</button>
+          <button id="help-toggle" data-i18n-aria-label="header.helpAria" aria-label="ヘルプ">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
               <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
           </button>
-          <button id="theme-toggle" aria-label="テーマ切替">
+          <button id="theme-toggle" data-i18n-aria-label="header.themeAria" aria-label="テーマ切替">
             <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -47,42 +65,44 @@
           </button>
         </div>
         <div class="indexing-mode-container">
-          <span class="indexing-mode-prefix">表モード:</span>
+          <span class="indexing-mode-prefix" data-i18n="header.indexingPrefix">表モード:</span>
           <span id="indexing-mode-label" class="toggle-label">A=0</span>
           <label class="toggle-switch">
             <input type="checkbox" id="indexing-mode-toggle" aria-label="表モードをA=1に切り替える">
             <span class="toggle-slider"></span>
           </label>
           <span class="indexing-mode-help">
-            <button type="button" class="help-icon" aria-describedby="indexing-help">?</button>
-            <span class="help-tooltip" id="indexing-help">ヴィジュネル表の計算方式。A=0（標準）では A+A=A、A=1 では A+A=B となります。</span>
+            <button type="button" class="help-icon" aria-describedby="indexing-help"
+                    data-i18n-aria-label="header.indexingHelpAria" aria-label="表モードの説明">?</button>
+            <span class="help-tooltip" id="indexing-help" data-i18n="header.indexingHelp">ヴィジュネル表の計算方式。A=0（標準）では A+A=A、A=1 では A+A=B となります。</span>
           </span>
         </div>
       </div>
     </div>
 
     <!-- Tab Navigation -->
-    <div class="tab-navigation" role="tablist" aria-label="機能の切り替え">
-      <button type="button" class="tab-button active" id="tab-cipher"
+    <div class="tab-navigation" role="tablist" data-i18n-aria-label="tabs.aria" aria-label="機能の切り替え">
+      <button type="button" class="tab-button active" id="tab-cipher" data-i18n="tabs.cipher"
               role="tab" aria-selected="true" aria-controls="panel-cipher" tabindex="0">暗号化・復号</button>
-      <button type="button" class="tab-button" id="tab-tabula"
+      <button type="button" class="tab-button" id="tab-tabula" data-i18n="tabs.tabula"
               role="tab" aria-selected="false" aria-controls="panel-tabula" tabindex="-1">タブラ・レクタ研究</button>
-      <button type="button" class="tab-button" id="tab-lab"
+      <button type="button" class="tab-button" id="tab-lab" data-i18n="tabs.lab"
               role="tab" aria-selected="false" aria-controls="panel-lab" tabindex="-1">実験室</button>
     </div>
 
     <!-- Tab 1: 暗号化・復号 -->
     <div id="panel-cipher" class="tab-content" role="tabpanel" aria-labelledby="tab-cipher">
-    <label for="mode">モード選択:</label>
+    <label for="mode" data-i18n="main.modeLabel">モード選択:</label>
     <select id="mode">
-      <option value="encrypt">暗号化</option>
-      <option value="decrypt">復号</option>
+      <option value="encrypt" data-i18n="main.modeEncrypt">暗号化</option>
+      <option value="decrypt" data-i18n="main.modeDecrypt">復号</option>
     </select>
 
     <div class="input-container">
       <div class="label-with-file-button">
-        <label for="inputText">平文（暗号化時）/ 暗号文（復号時）:</label>
-        <button type="button" id="fileSelectButton" class="file-select-button" title="ファイルを選択">
+        <label for="inputText" data-i18n="main.inputLabel">平文（暗号化時）/ 暗号文（復号時）:</label>
+        <button type="button" id="fileSelectButton" class="file-select-button"
+                data-i18n-title="main.fileButtonTitle" title="ファイルを選択">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14,2 14,8 20,8"></polyline>
@@ -93,14 +113,15 @@
         </button>
       </div>
       <div class="textarea-drop-zone" id="textareaDropZone">
-        <textarea id="inputText" rows="5" placeholder="ここにテキストを入力、またはファイルをドラッグ＆ドロップ"></textarea>
+        <textarea id="inputText" rows="5" data-i18n-placeholder="main.inputPlaceholder"
+                  placeholder="ここにテキストを入力、またはファイルをドラッグ＆ドロップ"></textarea>
         <div class="drop-overlay" id="dropOverlay">
           <div class="drop-message">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14,2 14,8 20,8"></polyline>
             </svg>
-            <p>ファイルをドロップしてください</p>
+            <p data-i18n="main.dropMessage">ファイルをドロップしてください</p>
           </div>
         </div>
       </div>
@@ -109,71 +130,72 @@
     <div id="inputTextWarning" aria-live="polite" class="warning-message"></div>
     <div id="inputTextError" aria-live="polite" class="error-message"></div>
 
-    <label for="key">鍵（英字）:</label>
-    <input type="text" id="key" placeholder="例: LEMON" />
-    <div id="keyWarning" aria-live="polite" class="warning-message">アルファベット以外は無視されます</div>
+    <label for="key" data-i18n="main.keyLabel">鍵（英字）:</label>
+    <input type="text" id="key" data-i18n-placeholder="main.keyPlaceholder" placeholder="例: LEMON" />
+    <div id="keyWarning" aria-live="polite" class="warning-message"
+         data-i18n="main.keyWarning">アルファベット以外は無視されます</div>
 
-    <label for="outputFormat">出力形式:</label>
+    <label for="outputFormat" data-i18n="main.formatLabel">出力形式:</label>
     <select id="outputFormat">
-      <option value="compact">詰めて出力（英字のみ・大文字）</option>
-      <option value="group5">5文字ごとに区切る</option>
-      <option value="preserve">書式を保つ（空白・記号・大文字小文字）</option>
+      <option value="compact" data-i18n="main.formatCompact">詰めて出力（英字のみ・大文字）</option>
+      <option value="group5" data-i18n="main.formatGroup5">5文字ごとに区切る</option>
+      <option value="preserve" data-i18n="main.formatPreserve">書式を保つ（空白・記号・大文字小文字）</option>
     </select>
 
-    <button id="processButton" disabled>実行</button>
+    <button id="processButton" data-i18n="main.processButton" disabled>実行</button>
 
-    <label for="sanitizedText">処理対象テキスト（英字のみ）:</label>
+    <label for="sanitizedText" data-i18n="main.sanitizedLabel">処理対象テキスト（英字のみ）:</label>
     <textarea id="sanitizedText" rows="3" readonly></textarea>
 
     <div class="output-container">
       <div class="label-with-button">
-        <label for="outputText">出力:</label>
+        <label for="outputText" data-i18n="main.outputLabel">出力:</label>
         <div class="button-container">
-          <button id="copyButton" class="copy-button" title="クリップボードにコピー">
+          <button id="copyButton" class="copy-button" data-i18n-title="main.copyTitle" title="クリップボードにコピー">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
             </svg>
           </button>
-          <div id="copyToast" aria-live="polite" class="copy-toast">コピーしました！</div>
+          <div id="copyToast" aria-live="polite" class="copy-toast" data-i18n="main.copyToast">コピーしました！</div>
         </div>
       </div>
       <textarea id="outputText" rows="5" readonly></textarea>
     </div>
 
-    <div id="visualization" tabindex="0" aria-label="visualization 横スクロール表示"></div>
-    <div id="vigenereTable" tabindex="0" aria-label="vigenereTable 横スクロール表示"></div>
+    <div id="visualization" tabindex="0" data-i18n-aria-label="main.vizAria" aria-label="対応関係の表（横スクロール）"></div>
+    <div id="vigenereTable" tabindex="0" data-i18n-aria-label="main.tableAria" aria-label="ヴィジュネル表（横スクロール）"></div>
     </div>
 
     <!-- Tab 2: タブラ・レクタ研究 -->
     <div id="panel-tabula" class="tab-content" role="tabpanel" aria-labelledby="tab-tabula" hidden>
-      <p>ヴィジュネル表（タブラ・レクタ）を使って、文字の換字変換を研究します。</p>
-      
+      <p data-i18n="tabula.intro">ヴィジュネル表（タブラ・レクタ）を使って、文字の換字変換を研究します。</p>
+
       <div class="table-guide">
-        <strong>📖 表の見方：</strong>
+        <strong data-i18n="tabula.guideTitle">📖 表の見方：</strong>
         <ul class="table-guide-list">
-          <li><strong>上部の行（横）</strong>：平文文字（A〜Z）</li>
-          <li><strong>左側の列（縦）</strong>：鍵文字（A〜Z）</li>
-          <li><strong>交差する場所</strong>：暗号文字</li>
+          <li><strong data-i18n="tabula.guideRowLabel">上部の行（横）</strong><span
+            data-i18n="tabula.guideRowText">：平文文字（A〜Z）</span></li>
+          <li><strong data-i18n="tabula.guideColLabel">左側の列（縦）</strong><span
+            data-i18n="tabula.guideColText">：鍵文字（A〜Z）</span></li>
+          <li><strong data-i18n="tabula.guideCrossLabel">交差する場所</strong><span
+            data-i18n="tabula.guideCrossText">：暗号文字</span></li>
         </ul>
-        <p id="table-example-text">
-          例：平文「H」＋鍵「K」→ 上部で「H」の列、左側で「K」の行を探し、交差する文字「<span id="table-example-result">R</span>」が暗号文<br>
-          <span class="example-formula">
-            <span id="table-example-formula">R</span>←shift(H, K)
-          </span>
-        </p>
+        <!-- 例文と計算結果が混ざる行なので、app.js が毎回組み立てる -->
+        <p id="table-example-text"></p>
       </div>
-      
-      <div id="researchTable" tabindex="0" aria-label="researchTable 横スクロール表示"></div>
-      
-      <h3>平文文字と鍵文字から、暗号文文字を計算する</h3>
-      
+
+      <div id="researchTable" tabindex="0" data-i18n-aria-label="tabula.tableAria"
+           aria-label="ヴィジュネル表（横スクロール）"></div>
+
+      <h3 data-i18n="tabula.headingForward">平文文字と鍵文字から、暗号文文字を計算する</h3>
+
       <div class="tabula-research">
         <div class="research-controls">
           <label for="plainChar">
-            平文文字:
+            <span data-i18n="tabula.plainCharLabel">平文文字:</span>
             <select id="plainChar">
-            <option value="">選択</option>
+            <option value="" data-i18n="tabula.selectOption">選択</option>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
@@ -202,11 +224,11 @@
             <option value="Z">Z</option>
             </select>
           </label>
-          
+
           <label for="keyChar">
-            鍵文字:
+            <span data-i18n="tabula.keyCharLabel">鍵文字:</span>
             <select id="keyChar">
-            <option value="">選択</option>
+            <option value="" data-i18n="tabula.selectOption">選択</option>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
@@ -235,26 +257,26 @@
             <option value="Z">Z</option>
             </select>
           </label>
-          
-          <button id="researchButton">計算</button>
-          
+
+          <button id="researchButton" data-i18n="tabula.calcButton">計算</button>
+
           <div id="researchCipherResult">
-            <span>暗号文文字:</span>
+            <span data-i18n="tabula.cipherCharLabel">暗号文文字:</span>
             <span id="cipherCharResult">―</span>
           </div>
         </div>
-        
+
         <div id="researchResult" aria-live="polite" class="research-result"></div>
       </div>
-      
-      <h3>平文文字と暗号文文字から、鍵文字を計算する</h3>
-      
+
+      <h3 data-i18n="tabula.headingReverse">平文文字と暗号文文字から、鍵文字を計算する</h3>
+
       <div class="tabula-research">
         <div class="research-controls">
           <label for="plainCharReverse">
-            平文文字:
+            <span data-i18n="tabula.plainCharLabel">平文文字:</span>
             <select id="plainCharReverse">
-            <option value="">選択</option>
+            <option value="" data-i18n="tabula.selectOption">選択</option>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
@@ -283,11 +305,11 @@
             <option value="Z">Z</option>
             </select>
           </label>
-          
+
           <label for="cipherCharReverse">
-            暗号文文字:
+            <span data-i18n="tabula.cipherCharLabel">暗号文文字:</span>
             <select id="cipherCharReverse">
-            <option value="">選択</option>
+            <option value="" data-i18n="tabula.selectOption">選択</option>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
@@ -316,15 +338,15 @@
             <option value="Z">Z</option>
             </select>
           </label>
-          
-          <button id="researchReverseButton">計算</button>
-          
+
+          <button id="researchReverseButton" data-i18n="tabula.calcButton">計算</button>
+
           <div id="researchReverseKeyResult">
-            <span>鍵文字:</span>
+            <span data-i18n="tabula.keyCharLabel">鍵文字:</span>
             <span id="keyCharReverseResult">―</span>
           </div>
         </div>
-        
+
         <div id="researchReverseResult" aria-live="polite" class="research-result"></div>
       </div>
     </div>
@@ -332,42 +354,43 @@
     <!-- Tab 3: ヴィジュネル暗号実験室 -->
     <div id="panel-lab" class="tab-content" role="tabpanel" aria-labelledby="tab-lab" hidden>
       <div class="experiment-section">
-        <h3>実験1: シーザー暗号との関係</h3>
-        <p>鍵が1文字の場合、ヴィジュネル暗号はシーザー暗号と同じになります。</p>
-        
+        <h3 data-i18n="lab.exp1Title">実験1: シーザー暗号との関係</h3>
+        <p data-i18n="lab.exp1Intro">鍵が1文字の場合、ヴィジュネル暗号はシーザー暗号と同じになります。</p>
+
         <div class="experiment-controls">
-          <label for="caesarText">平文:</label>
+          <label for="caesarText" data-i18n="lab.plainLabel">平文:</label>
           <input type="text" id="caesarText" placeholder="HELLO WORLD">
           <div id="caesarTextError" aria-live="polite" class="error-message"></div>
-          
-          <label for="caesarKey">鍵（1文字）:</label>
+
+          <label for="caesarKey" data-i18n="lab.caesarKeyLabel">鍵（1文字）:</label>
           <input type="text" id="caesarKey" maxlength="1" placeholder="K">
           <div id="caesarKeyError" aria-live="polite" class="error-message"></div>
-          
-          <button id="caesarButton">実験する</button>
+
+          <button id="caesarButton" data-i18n="lab.runButton">実験する</button>
         </div>
-        
+
         <div id="caesarResult" class="experiment-result"></div>
       </div>
-      
+
       <div class="experiment-section">
-        <h3>実験2: ワンタイムパッドとの関係</h3>
-        <p>平文の英字数と同じ長さの鍵を生成し、ワンタイムパッドの原理を実験します。鍵の配送・破棄までは再現しません。</p>
-        
+        <h3 data-i18n="lab.exp2Title">実験2: ワンタイムパッドとの関係</h3>
+        <p data-i18n="lab.exp2Intro">平文の英字数と同じ長さの鍵を生成し、ワンタイムパッドの原理を実験します。鍵の配送・破棄までは再現しません。</p>
+
         <div class="experiment-controls">
-          <label for="otpText">平文:</label>
+          <label for="otpText" data-i18n="lab.plainLabel">平文:</label>
           <input type="text" id="otpText" placeholder="SECRET">
           <div id="otpTextError" aria-live="polite" class="error-message"></div>
-          
+
           <div class="otp-key-controls">
-            <label for="otpKey">鍵（平文と同じ長さ）:</label>
-            <button id="generateKeyButton">ランダム鍵生成</button>
+            <label for="otpKey" data-i18n="lab.otpKeyLabel">鍵（平文と同じ長さ）:</label>
+            <button id="generateKeyButton" data-i18n="lab.generateKey">ランダム鍵生成</button>
           </div>
-          <input type="text" id="otpKey" placeholder="自動生成されます" readonly>
-          
-          <button id="otpButton">実験する</button>
+          <input type="text" id="otpKey" data-i18n-placeholder="lab.otpKeyPlaceholder"
+                 placeholder="自動生成されます" readonly>
+
+          <button id="otpButton" data-i18n="lab.runButton">実験する</button>
         </div>
-        
+
         <div id="otpResult" class="experiment-result"></div>
       </div>
     </div>
@@ -375,7 +398,9 @@
 
     <footer class="app-footer">
       <div class="footer">
-        🔗 GitHubリポジトリーはこちら（<a href="https://github.com/ipusiron/vigenere-cipher-tool" target="_blank" rel="noopener noreferrer"> ipusiron/vigenere-cipher-tool </a>）
+        <span data-i18n="footer.prefix">🔗 GitHubリポジトリーはこちら（</span><a
+          href="https://github.com/ipusiron/vigenere-cipher-tool" target="_blank"
+          rel="noopener noreferrer">ipusiron/vigenere-cipher-tool</a><span data-i18n="footer.suffix">）</span>
       </div>
     </footer>
 
@@ -383,102 +408,126 @@
   <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="help-modal-title">🔐 ヴィジュネル暗号ツール - 完全ガイド</h2>
-        <button class="modal-close" aria-label="閉じる">&times;</button>
+        <h2 id="help-modal-title" data-i18n="help.modalTitle">🔐 ヴィジュネル暗号ツール - 完全ガイド</h2>
+        <button class="modal-close" data-i18n-aria-label="help.closeAria" aria-label="閉じる">&times;</button>
       </div>
       <div class="modal-body">
-        <h3>概要</h3>
-        <p>ヴィジュネル暗号は、16世紀に考案された多表式換字暗号です。このツールでは暗号化・復号だけでなく、暗号の仕組みを研究・実験できます。</p>
-        
-        <h3>📝 タブ1: 暗号化・復号</h3>
-        <strong>基本的な使い方:</strong>
+        <h3 data-i18n="help.overviewTitle">概要</h3>
+        <p data-i18n="help.overviewBody">ヴィジュネル暗号は、16世紀に考案された多表式換字暗号です。このツールでは暗号化・復号だけでなく、暗号の仕組みを研究・実験できます。</p>
+
+        <h3 data-i18n="help.tab1Title">📝 タブ1: 暗号化・復号</h3>
+        <strong data-i18n="help.tab1BasicTitle">基本的な使い方:</strong>
         <ol>
-          <li><strong>モード選択</strong>: 「暗号化」または「復号」を選択</li>
-          <li><strong>テキスト入力</strong>: 平文または暗号文を入力
+          <li><strong data-i18n="help.t1s1Label">モード選択:</strong> <span
+            data-i18n="help.t1s1Text">「暗号化」または「復号」を選択</span></li>
+          <li><strong data-i18n="help.t1s2Label">テキスト入力:</strong> <span
+            data-i18n="help.t1s2Text">平文または暗号文を入力</span>
             <ul>
-              <li>📁 ファイル選択アイコンでテキストファイル読み込み</li>
-              <li>ドラッグ&ドロップでファイル読み込み対応</li>
-              <li>全角英字はエラーになります。その他の英字以外は無視し、「書式を保つ」ではそのまま出力します</li>
+              <li data-i18n="help.t1s2a">📁 ファイル選択アイコンでテキストファイル読み込み</li>
+              <li data-i18n="help.t1s2b">ドラッグ&amp;ドロップでファイル読み込み対応</li>
+              <li data-i18n="help.t1s2c">全角英字はエラーになります。その他の英字以外は無視し、「書式を保つ」ではそのまま出力します</li>
             </ul>
           </li>
-          <li><strong>鍵の入力</strong>: 暗号化・復号に使用する鍵を英字で入力（例: LEMON）</li>
-          <li><strong>出力形式</strong>: 詰めて出力／5文字ごとに区切る／書式を保つ、の3形式を選択</li>
-          <li><strong>実行</strong>: 「実行」ボタンをクリックして結果を表示</li>
-          <li><strong>結果コピー</strong>: 📋 コピーアイコンでワンクリックコピー</li>
+          <li><strong data-i18n="help.t1s3Label">鍵の入力:</strong> <span
+            data-i18n="help.t1s3Text">暗号化・復号に使用する鍵を英字で入力（例: LEMON）</span></li>
+          <li><strong data-i18n="help.t1s4Label">出力形式:</strong> <span
+            data-i18n="help.t1s4Text">詰めて出力／5文字ごとに区切る／書式を保つ、の3形式を選択</span></li>
+          <li><strong data-i18n="help.t1s5Label">実行:</strong> <span
+            data-i18n="help.t1s5Text">「実行」ボタンをクリックして結果を表示</span></li>
+          <li><strong data-i18n="help.t1s6Label">結果コピー:</strong> <span
+            data-i18n="help.t1s6Text">📋 コピーアイコンでワンクリックコピー</span></li>
         </ol>
-        
-        <strong>視覚化機能:</strong>
+
+        <strong data-i18n="help.tab1VizTitle">視覚化機能:</strong>
         <ul>
-          <li><strong>処理対象テキスト</strong>: 実際に処理される英字のみのテキスト表示</li>
-          <li><strong>対応関係の可視化</strong>: 平文・鍵・出力の文字対応を表形式で表示</li>
-          <li><strong>インタラクティブハイライト</strong>: セルにマウスを合わせると、ヴィジュネル表の該当部分をハイライト</li>
-          <li><strong>ヴィジュネル表（タブラ・レクタ）</strong>: 26×26の完全な換字表を常時表示</li>
+          <li><strong data-i18n="help.t1v1Label">処理対象テキスト:</strong> <span
+            data-i18n="help.t1v1Text">実際に処理される英字のみのテキスト表示</span></li>
+          <li><strong data-i18n="help.t1v2Label">対応関係の可視化:</strong> <span
+            data-i18n="help.t1v2Text">平文・鍵・出力の文字対応を表形式で表示</span></li>
+          <li><strong data-i18n="help.t1v3Label">インタラクティブハイライト:</strong> <span
+            data-i18n="help.t1v3Text">セルにマウスを合わせると、ヴィジュネル表の該当部分をハイライト</span></li>
+          <li><strong data-i18n="help.t1v4Label">ヴィジュネル表（タブラ・レクタ）:</strong> <span
+            data-i18n="help.t1v4Text">26×26の完全な換字表を常時表示</span></li>
         </ul>
-        
-        <h3>🔬 タブ2: タブラ・レクタ研究</h3>
-        <p>ヴィジュネル表を使った文字変換の仕組みを詳しく研究できます。</p>
+
+        <h3 data-i18n="help.tab2Title">🔬 タブ2: タブラ・レクタ研究</h3>
+        <p data-i18n="help.tab2Intro">ヴィジュネル表を使った文字変換の仕組みを詳しく研究できます。</p>
         <ul>
-          <li><strong>暗号化研究</strong>: 平文文字と鍵文字を選択して、暗号文字を計算</li>
-          <li><strong>復号研究</strong>: 平文文字と暗号文字から、使用された鍵文字を逆算</li>
-          <li><strong>数式表示</strong>: モジュロ26演算の詳細な計算過程を表示</li>
-          <li><strong>ハイライト機能</strong>: 選択した文字組み合わせをヴィジュネル表でハイライト</li>
+          <li><strong data-i18n="help.t2aLabel">暗号化研究:</strong> <span
+            data-i18n="help.t2aText">平文文字と鍵文字を選択して、暗号文字を計算</span></li>
+          <li><strong data-i18n="help.t2bLabel">復号研究:</strong> <span
+            data-i18n="help.t2bText">平文文字と暗号文字から、使用された鍵文字を逆算</span></li>
+          <li><strong data-i18n="help.t2cLabel">数式表示:</strong> <span
+            data-i18n="help.t2cText">モジュロ26演算の詳細な計算過程を表示</span></li>
+          <li><strong data-i18n="help.t2dLabel">ハイライト機能:</strong> <span
+            data-i18n="help.t2dText">選択した文字組み合わせをヴィジュネル表でハイライト</span></li>
         </ul>
-        
-        <h3>🧪 タブ3: 実験室</h3>
-        <p>ヴィジュネル暗号の特殊なケースや関連する暗号を実験できます。</p>
-        
-        <strong>シーザー暗号実験:</strong>
+
+        <h3 data-i18n="help.tab3Title">🧪 タブ3: 実験室</h3>
+        <p data-i18n="help.tab3Intro">ヴィジュネル暗号の特殊なケースや関連する暗号を実験できます。</p>
+
+        <strong data-i18n="help.t3CaesarTitle">シーザー暗号実験:</strong>
         <ul>
-          <li>1文字の鍵を使用したヴィジュネル暗号 = シーザー暗号</li>
-          <li>鍵の長さによる暗号の性質の違いを観察</li>
+          <li data-i18n="help.t3c1">1文字の鍵を使用したヴィジュネル暗号 = シーザー暗号</li>
+          <li data-i18n="help.t3c2">鍵の長さによる暗号の性質の違いを観察</li>
         </ul>
-        
-        <strong>ワンタイムパッド実験:</strong>
+
+        <strong data-i18n="help.t3OtpTitle">ワンタイムパッド実験:</strong>
         <ul>
-          <li>平文と同じ長さのランダム鍵を自動生成</li>
-          <li>crypto.getRandomValuesと棄却サンプリングによる鍵を使用</li>
-          <li>文字ごとの対応関係を詳細に可視化</li>
+          <li data-i18n="help.t3o1">平文と同じ長さのランダム鍵を自動生成</li>
+          <li data-i18n="help.t3o2">crypto.getRandomValuesと棄却サンプリングによる鍵を使用</li>
+          <li data-i18n="help.t3o3">文字ごとの対応関係を詳細に可視化</li>
         </ul>
-        
-        <h3>🎨 その他の機能</h3>
+
+        <h3 data-i18n="help.otherTitle">🎨 その他の機能</h3>
         <ul>
-          <li><strong>表モード切替（A=0 / A=1）</strong>: タブ横のトグルで計算方式を切り替え
+          <li><strong data-i18n="help.o1Label">表モード切替（A=0 / A=1）:</strong> <span
+            data-i18n="help.o1Text">タブ横のトグルで計算方式を切り替え</span>
             <ul>
-              <li>A=0（標準）: A=0, B=1, ..., Z=25。A+A=A</li>
-              <li>A=1: A=1, B=2, ..., Z=26。A+A=B（一部の文献で使用）</li>
+              <li data-i18n="help.o1a">A=0（標準）: A=0, B=1, ..., Z=25。A+A=A</li>
+              <li data-i18n="help.o1b">A=1: A=1, B=2, ..., Z=26。A+A=B（一部の文献で使用）</li>
             </ul>
           </li>
-          <li><strong>ダークモード</strong>: 🌙 アイコンでライト/ダーク切り替え</li>
-          <li><strong>レスポンシブ対応</strong>: 長いテキストでも横スクロールで快適に表示</li>
-          <li><strong>固定ヘッダー</strong>: スクロール時も列ラベルが常に表示</li>
-          <li><strong>キーボードショートカット</strong>: Escキーでモーダルを閉じる</li>
+          <li><strong data-i18n="help.o2Label">ダークモード:</strong> <span
+            data-i18n="help.o2Text">🌙 アイコンでライト/ダーク切り替え</span></li>
+          <li><strong data-i18n="help.o3Label">レスポンシブ対応:</strong> <span
+            data-i18n="help.o3Text">長いテキストでも横スクロールで快適に表示</span></li>
+          <li><strong data-i18n="help.o4Label">固定ヘッダー:</strong> <span
+            data-i18n="help.o4Text">スクロール時も列ラベルが常に表示</span></li>
+          <li><strong data-i18n="help.o5Label">キーボードショートカット:</strong> <span
+            data-i18n="help.o5Text">Escキーでモーダルを閉じる</span></li>
+          <li><strong data-i18n="help.o6Label">日本語・英語の切り替え:</strong> <span
+            data-i18n="help.o6Text">ヘッダーのボタンで表示言語を切り替え（選択は次回も引き継ぎます）</span></li>
         </ul>
-        
-        <h3>⚡ 暗号化の仕組み</h3>
-        <p>各文字は以下の数学的手順で変換されます（表モードで切替可能）：</p>
+
+        <h3 data-i18n="help.mechTitle">⚡ 暗号化の仕組み</h3>
+        <p data-i18n="help.mechIntro">各文字は以下の数学的手順で変換されます（表モードで切替可能）：</p>
         <ol>
-          <li><strong>文字コード変換</strong>:
+          <li><strong data-i18n="help.m1Label">文字コード変換:</strong>
             <ul>
-              <li>A=0モード: A=0, B=1, ..., Z=25</li>
-              <li>A=1モード: A=1, B=2, ..., Z=26</li>
+              <li data-i18n="help.m1a">A=0モード: A=0, B=1, ..., Z=25</li>
+              <li data-i18n="help.m1b">A=1モード: A=1, B=2, ..., Z=26</li>
             </ul>
           </li>
-          <li><strong>モジュロ26演算</strong>:
+          <li><strong data-i18n="help.m2Label">モジュロ26演算:</strong>
             <ul>
-              <li>A=0: 暗号化 = (平文 + 鍵) mod 26</li>
-              <li>A=1: 暗号化 = (平文 + 鍵) mod 26（0は26と読む）</li>
+              <li data-i18n="help.m2a">A=0: 暗号化 = (平文 + 鍵) mod 26</li>
+              <li data-i18n="help.m2b">A=1: 暗号化 = (平文 + 鍵) mod 26（0は26と読む）</li>
             </ul>
           </li>
-          <li><strong>鍵の循環</strong>: 鍵は平文の長さに合わせて繰り返し使用</li>
-          <li><strong>結果表示</strong>: 数値を再び文字に変換して出力</li>
+          <li><strong data-i18n="help.m3Label">鍵の循環:</strong> <span
+            data-i18n="help.m3Text">鍵は平文の長さに合わせて繰り返し使用</span></li>
+          <li><strong data-i18n="help.m4Label">結果表示:</strong> <span
+            data-i18n="help.m4Text">数値を再び文字に変換して出力</span></li>
         </ol>
-        
-        <h3>⚠️ セキュリティに関する注意</h3>
-        <p><strong>このツールは教育・学習目的です。</strong>ヴィジュネル暗号は現代のセキュリティ基準では安全ではありません：</p>
+
+        <h3 data-i18n="help.secTitle">⚠️ セキュリティに関する注意</h3>
+        <p><strong data-i18n="help.secStrong">このツールは教育・学習目的です。</strong><span
+          data-i18n="help.secLead">ヴィジュネル暗号は現代のセキュリティ基準では安全ではありません：</span></p>
         <ul>
-          <li>短い鍵は周期性により解読される可能性があります</li>
-          <li>頻度解析や既知平文攻撃に対して脆弱です</li>
-          <li>実際の機密情報の保護には使用しないでください</li>
+          <li data-i18n="help.sec1">短い鍵は周期性により解読される可能性があります</li>
+          <li data-i18n="help.sec2">頻度解析や既知平文攻撃に対して脆弱です</li>
+          <li data-i18n="help.sec3">実際の機密情報の保護には使用しないでください</li>
         </ul>
       </div>
     </div>

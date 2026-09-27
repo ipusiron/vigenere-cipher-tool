@@ -11,6 +11,7 @@ test('readable source line lengths', () => {
 test('major files retain readable structure', () => {
   for (const [file, minimum] of [
     ['index.html', 400], ['js/core/cipher.js', 120], ['js/features/main-tab.js', 250],
-    ['js/ui/table-generator.js', 250], ['js/app.js', 130], ['css/components/buttons.css', 250]
+    ['js/ui/table-generator.js', 250], ['js/app.js', 130], ['css/components/buttons.css', 250],
+    ['js/i18n.js', 400]
   ]) assert.ok(read(file).split('\n').length >= minimum, file);
 });

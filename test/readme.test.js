@@ -49,8 +49,29 @@ test('README YAML preserves original key order, identity and block lists', () =>
   }
 });
 
-test('all three documents describe the implemented dependencies and randomness', () => {
-  for (const path of ['README.md', 'CLAUDE.md', 'TECHNICAL.md']) {
+test('all four documents describe the implemented dependencies and randomness', () => {
+  for (const path of ['README.md', 'README.en.md', 'CLAUDE.md', 'TECHNICAL.md']) {
     assert.doesNotMatch(read(path), /Alpine|暗号学的に安全な疑似乱数使用|完全ランダム/);
   }
+});
+
+test('the two READMEs cross-link and agree on the examples and the structure', () => {
+  const japanese = read('README.md');
+  const english = read('README.en.md');
+  assert.match(japanese, /^# .+\r?\n\r?\n\[English\]\(README\.en\.md\) · 日本語$/m);
+  assert.match(english, /^# .+\r?\n\r?\nEnglish · \[日本語\]\(README\.md\)$/m);
+  // 動作例の期待値は日英で一致しなければならない
+  const results = (text, heading) => [...text.split(heading)[1].split('\n### ')[0]
+    .matchAll(/^\| .+ \| .+ \| A=[01] \| .+ \| (.+) \|$/gm)].map(row => row[1]);
+  const englishResults = results(english, '### Worked examples');
+  assert.ok(englishResults.length >= 8);
+  assert.deepEqual(englishResults, results(japanese, '### 動作例'));
+  // 両方の構造図が、日英対応で増えた実体を指している
+  for (const text of [japanese, english]) {
+    for (const entry of ['i18n.js', 'formula-text.js', 'i18n.test.js', 'README.en.md']) {
+      assert.ok(text.includes(entry), entry);
+    }
+  }
+  assert.ok(english.includes('?lang=ja'));
+  assert.ok(japanese.includes('?lang=ja'));
 });

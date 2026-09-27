@@ -11,9 +11,13 @@ import { getIndexingOffset } from '../core/indexing-mode.js';
 import { mainTabElements } from '../ui/dom-elements.js';
 import { displayValidationMessage, showToast, showWarning, showError } from '../ui/message-display.js';
 import { displayVisualization, highlightTableCell, clearTableHighlight } from '../ui/table-generator.js';
+import { I18n } from '../i18n.js';
 
 let hasResult = false;
-let loadWarning = '';
+// 読み込みの指摘は訳した文ではなく {key, params} で持つ。言語を変えても訳し直せる。
+let loadWarning = null;
+// ファイルやURLに対する指摘。検証の描き直しで消えないよう、入力が変わるまで持ち続ける。
+let loadError = null;
 
 export const clearMainResult = () => {
   hasResult = false;
@@ -27,10 +31,23 @@ const applyLoadedText = (raw) => {
   const loaded = normalizeLoadedText(raw);
   mainTabElements.inputText().value = loaded.text;
   loadWarning = loaded.truncated
-    ? `先頭${MAX_TEXT_LENGTH.toLocaleString('en-US')}文字だけを読み込みました（元は${loaded.originalLength.toLocaleString('en-US')}文字）`
-    : '';
+    ? {
+      key: 'warning.truncated',
+      params: {
+        max: MAX_TEXT_LENGTH.toLocaleString('en-US'),
+        total: loaded.originalLength.toLocaleString('en-US')
+      }
+    }
+    : null;
+  loadError = null;
   clearMainResult();
   validateMainInputs();
+};
+
+/** ファイルやURLの失敗を覚えてから描く。 */
+const showLoadError = (key, params = {}) => {
+  loadError = { key, params };
+  showError(mainTabElements.inputTextError(), key, params);
 };
 
 export const refreshMainResult = () => {
@@ -62,7 +79,10 @@ export const validateMainInputs = () => {
   const canProcess = hasValidText && hasValidKey && inputValidation.isValid;
   processButton.disabled = !canProcess;
   if (!canProcess) clearMainResult();
-  if (loadWarning) showWarning(inputTextWarning, loadWarning);
+  if (loadWarning) showWarning(inputTextWarning, loadWarning.key, loadWarning.params);
+  if (loadError && inputValidation.type !== 'error') {
+    showError(inputTextError, loadError.key, loadError.params);
+  }
   return canProcess;
 };
 
@@ -176,7 +196,7 @@ export const loadTextFromUrl = () => {
     applyLoadedText(raw);
     mainTabElements.inputText().value = readTextParam(url.search);
   } catch {
-    showError(mainTabElements.inputTextError(), 'URLのテキストを読み込めませんでした');
+    showLoadError('error.urlText');
   } finally {
     url.searchParams.delete('text');
     window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
@@ -208,22 +228,25 @@ export const handleFileChange = (event) => {
  * @param {File} file - ファイルオブジェクト
  */
 export const handleFileLoad = async (file) => {
+  loadError = null;
+  const validation = validateFile(file);
+
+  if (!validation.isValid) {
+    showLoadError(validation.key, validation.params);
+    return;
+  }
+
   try {
-    const validation = validateFile(file);
-    
-    if (!validation.isValid) {
-      throw new Error(validation.message);
-    }
-    
     const content = await readFileAsText(file);
-    
+
     if (content.trim()) {
       applyLoadedText(content);
     } else {
-      throw new Error('ファイルが空です');
+      showLoadError('error.fileEmpty');
     }
   } catch (error) {
-    showError(mainTabElements.inputTextError(), error.message || 'ファイルの処理に失敗しました');
+    // 例外のメッセージは辞書のキー。辞書に無いものは共通の失敗として扱う。
+    showLoadError(I18n.has(error.message) ? error.message : 'error.fileProcess');
   }
 };
 
@@ -280,7 +303,8 @@ export const initMainTabEventListeners = () => {
   
   // 入力検証
   mainTabElements.inputText().addEventListener('input', () => {
-    loadWarning = '';
+    loadWarning = null;
+    loadError = null;
     clearMainResult();
     validateMainInputs();
   });

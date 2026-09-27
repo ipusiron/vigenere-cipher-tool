@@ -6,6 +6,7 @@
 import { ALPHABET_SIZE, CHAR_CODE_A, encryptChar } from '../core/cipher.js';
 import { VIZ_MAX_CHARS } from '../core/input.js';
 import { getIndexingOffset } from '../core/indexing-mode.js';
+import { I18n } from '../i18n.js';
 
 /**
  * ツールチップを作成
@@ -130,7 +131,7 @@ export const generateVigenereTable = (container, tableClass = 'vig-table') => {
 export const generateMainTable = (container) => {
   const table = generateVigenereTable(container, 'vig-table');
   const title = document.createElement('h3');
-  title.textContent = 'ヴィジュネル表（タブラ・レクタ）';
+  title.textContent = I18n.t('viz.tableTitle');
   container.replaceChildren(title);
   container.appendChild(table);
 };
@@ -142,7 +143,7 @@ export const generateMainTable = (container) => {
 export const generateResearchTable = (container) => {
   const table = generateVigenereTable(container, 'vig-table research-table');
   const title = document.createElement('h3');
-  title.textContent = 'ヴィジュネル表（タブラ・レクタ）';
+  title.textContent = I18n.t('viz.tableTitle');
   container.replaceChildren(title);
   container.appendChild(table);
 };
@@ -275,35 +276,36 @@ export const createVisualizationRow = (label, data, key) => {
 export const displayVisualization = (container, data, mode = 'encrypt') => {
   // モードに応じてタイトルを変更
   const isEncrypt = mode === 'encrypt';
-  const title = isEncrypt 
-    ? '対応関係（平文＋鍵 → 出力）'
-    : '対応関係（暗号文＋鍵 → 出力）';
-  
+  const title = I18n.t(isEncrypt ? 'viz.titleEncrypt' : 'viz.titleDecrypt');
+
   const heading = document.createElement('h3');
   heading.textContent = title;
   container.replaceChildren(heading);
   if (data.length > VIZ_MAX_CHARS) {
     const notice = document.createElement('p');
-    notice.textContent = `対応表は先頭1,000文字だけを表示しています（全${data.length.toLocaleString('en-US')}文字）`;
+    notice.textContent = I18n.t('viz.truncated', {
+      max: VIZ_MAX_CHARS.toLocaleString('en-US'),
+      total: data.length.toLocaleString('en-US')
+    });
     container.appendChild(notice);
   }
   data = data.slice(0, VIZ_MAX_CHARS);
-  
+
   const table = document.createElement('div');
   table.className = 'viz-table';
-  
+
   // モードに応じて行の順序とラベルを変更
   if (isEncrypt) {
     // 暗号化モード: 平文（入力） → 鍵 → 暗号文（出力）
-    table.appendChild(createVisualizationRow('平文', data, 'plain'));
-    table.appendChild(createVisualizationRow('鍵', data, 'key'));
-    table.appendChild(createVisualizationRow('出力', data, 'result'));
+    table.appendChild(createVisualizationRow(I18n.t('viz.rowPlain'), data, 'plain'));
+    table.appendChild(createVisualizationRow(I18n.t('viz.rowKey'), data, 'key'));
+    table.appendChild(createVisualizationRow(I18n.t('viz.rowOutput'), data, 'result'));
   } else {
     // 復号モード: 暗号文（入力） → 鍵 → 平文（出力）
     // cipher.jsでは、復号時: plain=出力(平文), result=入力(暗号文)
-    table.appendChild(createVisualizationRow('暗号文', data, 'result'));
-    table.appendChild(createVisualizationRow('鍵', data, 'key'));
-    table.appendChild(createVisualizationRow('出力', data, 'plain'));
+    table.appendChild(createVisualizationRow(I18n.t('viz.rowCipher'), data, 'result'));
+    table.appendChild(createVisualizationRow(I18n.t('viz.rowKey'), data, 'key'));
+    table.appendChild(createVisualizationRow(I18n.t('viz.rowOutput'), data, 'plain'));
   }
   
   container.appendChild(table);

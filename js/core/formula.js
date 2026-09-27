@@ -1,11 +1,11 @@
-/** 表示上の番号（A=0またはA=1）で計算式を作る。 */
+/** 表示上の番号（A=0またはA=1）で計算式を作る。文言は持たず、式の部品だけを返す。 */
 export const displayValue = (char, offset = 0) => char.charCodeAt(0) - 65 + (offset === 1 ? 1 : 0);
 
 const formula = (left, right, operator, offset) => {
   const value = ((operator === '+' ? left + right : left - right) % 26 + 26) % 26;
-  const annotation = offset === 1 && value === 0 ? '（0は26と読む）' : '';
+  const readAs26 = offset === 1 && value === 0;
   const char = String.fromCharCode(65 + (value - (offset === 1 ? 1 : 0) + 26) % 26);
-  return `(${left} ${operator} ${right}) mod 26 = ${value}${annotation} → ${char}`;
+  return { left, right, operator, value, readAs26, char };
 };
 
 export const encryptFormula = (plainChar, keyChar, offset = 0) => {
