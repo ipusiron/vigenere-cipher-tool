@@ -17,6 +17,24 @@ export const readTextParam = (search) => {
   return raw === null ? null : normalizeLoadedText(raw).text;
 };
 
+/** 受け渡しの値は「#」より後ろ（サーバーへ送られず、URLの長さの上限もない）を優先し、なければ「?」から読む。 */
+export const linkParams = (search, hash) => {
+  const fromHash = new URLSearchParams(String(hash || '').replace(/^#/, ''));
+  return fromHash.has('text') ? fromHash : new URLSearchParams(search || '');
+};
+
+/** 読み込んだtextを「?」と「#」の両方から消したときのパス。textがなければnull。 */
+export const urlWithoutText = (href) => {
+  const url = new URL(href);
+  const fromHash = new URLSearchParams(url.hash.slice(1));
+  const inHash = fromHash.has('text');
+  if (!url.searchParams.has('text') && !inHash) return null;
+  url.searchParams.delete('text');
+  fromHash.delete('text');
+  const hash = inHash ? fromHash.toString() : url.hash.slice(1);
+  return url.pathname + url.search + (hash ? `#${hash}` : '');
+};
+
 /** 文字数はUTF-16コード単位ではなくコードポイントで数える。 */
 export const analyzeInput = (text) => {
   let letters = 0;

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeLoadedText, readTextParam, analyzeInput } from '../js/core/input.js';
+import { normalizeLoadedText, readTextParam, analyzeInput, linkParams, urlWithoutText } from '../js/core/input.js';
 
 test('URL parameters are decoded once', () => {
   const cases = [
@@ -32,4 +32,18 @@ test('limits never split a surrogate pair', () => {
 test('input analysis counts code points', () => {
   assert.deepEqual(analyzeInput('HELLO 世界 😀'), { letters: 5, fullwidthLatin: 0, ignored: 5 });
   assert.deepEqual(analyzeInput('ＡＢＣ abc'), { letters: 3, fullwidthLatin: 3, ignored: 4 });
+});
+test('#text= is read first, then ?text=', () => {
+  assert.equal(linkParams('?text=QUERY', '#text=HASH').get('text'), 'HASH');
+  assert.equal(linkParams('?text=QUERY', '').get('text'), 'QUERY');
+  assert.equal(linkParams('', '#text=TOM%20%26%20JERRY').get('text'), 'TOM & JERRY');
+  assert.equal(linkParams('?lang=en', '#x=1').has('text'), false);
+});
+test('loaded text is removed from both ? and # (other values stay)', () => {
+  const base = 'https://ipusiron.github.io/vigenere-cipher-tool/';
+  assert.equal(urlWithoutText(`${base}?text=ABC&lang=en`), '/vigenere-cipher-tool/?lang=en');
+  assert.equal(urlWithoutText(`${base}?lang=en#text=ABC`), '/vigenere-cipher-tool/?lang=en');
+  assert.equal(urlWithoutText(`${base}#text=ABC&x=1`), '/vigenere-cipher-tool/#x=1');
+  assert.equal(urlWithoutText(`${base}?text=ABC#top`), '/vigenere-cipher-tool/#top');
+  assert.equal(urlWithoutText(`${base}?lang=en#top`), null);
 });

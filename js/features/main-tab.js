@@ -6,7 +6,7 @@
 import { vigenere, sanitize, formatOutput } from '../core/cipher.js';
 import { validateInputText, validateFile } from '../core/validation.js';
 import { readFileAsText } from '../core/utils.js';
-import { normalizeLoadedText, readTextParam, MAX_TEXT_LENGTH } from '../core/input.js';
+import { normalizeLoadedText, linkParams, urlWithoutText, MAX_TEXT_LENGTH } from '../core/input.js';
 import { getIndexingOffset } from '../core/indexing-mode.js';
 import { mainTabElements } from '../ui/dom-elements.js';
 import { displayValidationMessage, showToast, showWarning, showError } from '../ui/message-display.js';
@@ -186,20 +186,22 @@ export const copyToClipboard = async () => {
 };
 
 /**
- * URLパラメータからテキストを読み込み
+ * URLの「#text=」（優先）か「?text=」からテキストを読み込み、読み込んだらURLから消す
  */
 export const loadTextFromUrl = () => {
-  const url = new URL(window.location.href);
-  if (!url.searchParams.has('text')) return;
+  const params = linkParams(window.location.search, window.location.hash);
+  if (!params.has('text')) return;
   try {
-    const raw = url.searchParams.get('text');
-    applyLoadedText(raw);
-    mainTabElements.inputText().value = readTextParam(url.search);
+    applyLoadedText(params.get('text'));
   } catch {
     showLoadError('error.urlText');
   } finally {
-    url.searchParams.delete('text');
-    window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+    const cleaned = urlWithoutText(window.location.href);
+    try {
+      if (cleaned !== null) window.history.replaceState({}, document.title, cleaned);
+    } catch {
+      // file://などで消せなくても、読み込みは続ける
+    }
   }
 };
 

@@ -83,7 +83,7 @@ Meta cannot enforce frame-ancestors or HTTP-only security headers. User content 
 - Visualization: first 1,000 letters (at most 3,000 data cells), full output remains available
 
 ### URL Parameters
-- `?text=VALUE` - Pre-populate input field with encoded text
+- `#text=VALUE` (preferred; not sent to the server, no URL length limit) or `?text=VALUE` - Pre-populate input field with encoded text (`linkParams`; removed from both `#` and `?` after loading with `urlWithoutText`)
 - URLSearchParams decodes once; normalizeLoadedText removes only controls and enforces limits
 - Remove the text query parameter even when loading fails
 
