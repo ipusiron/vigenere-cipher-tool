@@ -183,8 +183,10 @@ The input limit is 100,000 characters (UTF-16 code units), and a UTF-8 file may 
 is loaded from the beginning only, and the page says so. The mapping shows the first 1,000 letters, while the
 output box holds the whole result.
 Full-width letters have to be replaced with half-width letters before you run.
-Text can also arrive through a URL parameter such as `?text=TOM%20%26%20JERRY`. Once it is loaded, `text` is
-removed from the URL.
+Text can also arrive through the URL, as `#text=TOM%20%26%20JERRY` (recommended) or `?text=TOM%20%26%20JERRY`. The part after `#` is
+not sent to the server, so the ciphertext does not reach GitHub Pages and is not subject to the URL length limit (GitHub Pages
+accepts up to 8,192 bytes for the path and the part after `?`). If both are present, `#` wins. Once it is loaded, `text` is
+removed from both `#` and `?` in the URL.
 
 ### Worked examples
 
