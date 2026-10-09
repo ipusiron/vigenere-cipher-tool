@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { read, root } from './helpers.js';
-import { formatOutput } from '../js/core/cipher.js';
+import { formatOutput, vigenere } from '../js/core/cipher.js';
 import { MAX_TEXT_LENGTH, MAX_FILE_BYTES, VIZ_MAX_CHARS } from '../js/core/input.js';
 
 test('README examples are recalculated, including every output format', () => {
@@ -74,4 +74,19 @@ test('the two READMEs cross-link and agree on the examples and the structure', (
   }
   assert.ok(english.includes('?lang=ja'));
   assert.ok(japanese.includes('?lang=ja'));
+});
+
+test('ユースケースの「このツールならではの使い方」の例は暗号化と一致する（日英）', () => {
+  const ja = read('README.md');
+  const en = read('README.en.md');
+  assert.equal(vigenere('HELLO', 'D', 'encrypt').result, 'KHOOR');
+  assert.equal(vigenere('AAAAAA', 'KEY', 'encrypt').result, 'KEYKEY');
+  const both = vigenere('HELLOHELLO', 'KEY', 'encrypt').result;
+  assert.equal(both, 'RIJVSFOPJY');
+  assert.equal(both.slice(0, 5), 'RIJVS');
+  assert.equal(both.slice(5), 'FOPJY');
+  for (const md of [ja, en]) {
+    assert.ok(md.includes('KHOOR') && md.includes('KEYKEY'));
+    assert.ok(md.includes('RIJVSFOPJY') || (md.includes('RIJVS') && md.includes('FOPJY')));
+  }
 });
