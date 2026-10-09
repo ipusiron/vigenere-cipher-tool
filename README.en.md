@@ -259,6 +259,12 @@ handled directly.
 
 ## 🏆 What the tool has been used for
 
+### 🎯 Ways of using this tool in particular
+
+- Confirming that a key of length 1 becomes a Caesar cipher (classical-cipher classes): with the one-letter key D, encrypting HELLO gives KHOOR, the same as a Caesar cipher that shifts every letter by 3. You can confirm, moving the table mode, that a Vigenere cipher degenerates to a Caesar cipher when the key has length 1
+- Confirming that the key appears as-is in an all-A text (known-plaintext and key-exposure classes): encrypting AAAAAA with the key KEY gives KEYKEY. Because A is a shift of 0, the key shows up in the ciphertext, repeated. It shows that where a stretch of plaintext is fully known, the key is exposed from it
+- Confirming that the same plaintext becomes different ciphertext by position (the strength of a polyalphabetic cipher): encrypting HELLOHELLO with the key KEY gives RIJVSFOPJY, where the first HELLO becomes RIJVS and the second becomes FOPJY, different ciphertext, because the key is at a different phase. You can confirm why frequency analysis is harder than against a simple substitution, where the same letter always becomes the same ciphertext
+
 ### 🎮 Solving the cipher game Cypher
 
 - [POLYALPHABETIC SUBSTITUTION PUZZLE 01 (Cypher)](https://akademeia.info/?p=36228)
